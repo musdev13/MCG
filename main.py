@@ -16,8 +16,8 @@ pygame.display.set_caption("Marko Corner")
 
 # background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # Масштабирование под размер окна
 
-level = "dreamW"
-debugGrid = True
+level = "intro"
+
 
 
 # Основной цикл программы

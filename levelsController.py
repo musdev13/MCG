@@ -5,3 +5,6 @@ class LController:
         if levelName == "dreamW":
             from maps.dreamW import DreamW
             return DreamW(screen).draw()
+        if levelName == "intro":
+            from maps.intro import intro
+            return intro(screen).draw()
