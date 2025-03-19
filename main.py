@@ -5,6 +5,7 @@ from settings import *
 
 # Инициализация Pygame
 pygame.init()
+clock = pygame.time.Clock()
 
 # Размеры окна
 
@@ -39,6 +40,7 @@ while running:
     # Обновление экрана
     # pygame.time.Clock().tick(30)
     pygame.display.flip()
+    clock.tick(30)
     
 
 # Завершение работы Pygame
