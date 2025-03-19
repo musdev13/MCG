@@ -19,7 +19,6 @@ pygame.display.set_caption("Marko Corner")
 level = "intro"
 
 
-
 # Основной цикл программы
 running = True
 while running:
