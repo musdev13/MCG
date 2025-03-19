@@ -15,8 +15,7 @@ pygame.display.set_caption("Marko Corner")
 
 
 # background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # Масштабирование под размер окна
-
-level = "intro"
+Level.levelName = "intro"
 
 
 # Основной цикл программы
@@ -26,7 +25,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    LC.loadLevel(levelName=level, screen=screen)
+    levelName = Level.levelName
+    LC.loadLevel(levelName=levelName, screen=screen)
 
     # Отрисовка сетки
     if debugGrid:
@@ -35,8 +35,11 @@ while running:
         for y in range(0, HEIGHT, 48):
             pygame.draw.line(screen, gridColor, (0, y), (WIDTH, y))
 
+    
     # Обновление экрана
+    # pygame.time.Clock().tick(30)
     pygame.display.flip()
+    
 
 # Завершение работы Pygame
 pygame.quit()
