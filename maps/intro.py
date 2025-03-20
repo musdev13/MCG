@@ -7,6 +7,7 @@ import time
 class intro:
     def __init__(self, screen, gamePath=gamePath):
         self.screen = screen
+        self.gamePath = gamePath
 
     def draw(self):
         running = True
@@ -24,17 +25,18 @@ class intro:
 
             current_time = time.time() - start_time
 
-            if current_time < 3:
+            if current_time < 2:
                 pass
             elif current_time < 10:
                 text_alpha = min(255, (current_time - 3) * 51)  # Fade in over 5 seconds
                 font = pygame.font.Font(None, 36)
-                text = font.render("привет", True, (255, 255, 255))
+                font = pygame.font.Font(f"{self.gamePath}/Mcg.ttf", 48)
+                text = font.render("how much is left?", True, (255, 255, 255))
                 text.set_alpha(int(text_alpha))
                 text_rect = text.get_rect(center=(self.screen.get_width()/2, self.screen.get_height()/2))
                 self.screen.blit(text, text_rect)
             
-            if current_time > 11:  # Total duration: 3 + 5 + 3 = 11 seconds
+            if current_time > 13:  # Total duration: 3 + 5 + 3 = 11 seconds
                 running = False
                 print("intro end")
                 Level.levelName = "dreamW"
