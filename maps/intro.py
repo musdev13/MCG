@@ -36,7 +36,7 @@ class intro:
                 text_rect = text.get_rect(center=(self.screen.get_width()/2, self.screen.get_height()/2))
                 self.screen.blit(text, text_rect)
             
-            if current_time > 13:  # Total duration: 3 + 5 + 3 = 11 seconds
+            if current_time > 12:  # Total duration: 3 + 5 + 3 = 11 seconds
                 running = False
                 print("intro end")
                 Level.levelName = "dreamW"

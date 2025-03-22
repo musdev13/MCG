@@ -1,23 +1,6 @@
 import pygame
-from settings import playerSpeed
+from settings import playerSpeed, gamePath
 class Player:
-    def __init__(self, x, y, angle):
-        self.x = x
-        self.y = y
-        self.speed = playerSpeed
-        self.angle = angle #0 - вверх, 1 - вправо, 2 - вниз, 3 - влево
-
-    def __init__(self, x, y, angle):
-        self.x = x
-        self.y = y
-        self.speed = playerSpeed
-        self.angle = angle
-        self.canMove = True
-        self.targetX = x
-        self.targetY = y
-        self.movingTimer = 0
-        self.gridSize = 48
-
     def __init__(self, x, y, angle):
         self.x = x
         self.y = y
@@ -30,10 +13,10 @@ class Player:
         self.gridSize = 48
         # Load player sprites
         self.sprites = {
-            'up': pygame.image.load("gamePath/img/player/idle_u.png"),
-            'down': pygame.image.load("gamePath/img/player/idle_d.png"),
-            'left': pygame.image.load("gamePath/img/player/idle_l.png"),
-            'right': pygame.image.load("gamePath/img/player/idle_r.png")
+            'up': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_u.png"), (96, 96)),
+            'down': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_d.png"), (96, 96)),
+            'left': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_l.png"), (96, 96)),
+            'right': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_r.png"), (96, 96))
         }
         self.current_sprite = self.sprites['down']  # Default facing down
 
@@ -81,7 +64,4 @@ class Player:
     
     def draw(self, screen):
         screen.blit(self.current_sprite, (self.x, self.y))
-    
-    def draw(self, screen):
-        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, 48, 48))
     
