@@ -12,4 +12,4 @@ class Level:
     def getLevelName(self):
         return Level.levelName    # Access via class nam
 
-playerSpeed = 3.5
+playerSpeed = 1.5
