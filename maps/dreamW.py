@@ -6,7 +6,7 @@ from dialog import Dialog
 
 class DreamW:
     def __init__(self, screen, gamePath=gamePath):
-        self.play_intro = True  # New flag to control intro sequence and dialogs
+        self.play_intro = False  # New flag to control intro sequence and dialogs
         self.screen = screen
         self.background = pygame.image.load(f"{gamePath}/img/dreamW/bg.png")
         self.grid_size = 48
@@ -41,6 +41,10 @@ class DreamW:
         self.carpetDialog = Dialog(screen, [
             ["Just a carpet with a cute face", None, None, False, False],
             ["Nothing special", None, None, False, False]
+        ], self.player)
+        self.spotDialog = Dialog(screen, [
+            ["Just a spot", None, None, False, False],
+            ["You hope it gets erased soon", None, None, False, False]
         ], self.player)
         
         # Add intro sequence properties
@@ -122,7 +126,8 @@ class DreamW:
             self.dialog.is_active,
             self.dialog1.is_active,
             self.paperDialog.is_active,
-            self.carpetDialog.is_active
+            self.carpetDialog.is_active,
+            self.spotDialog.is_active
         ])
 
     def draw(self):
@@ -164,7 +169,7 @@ class DreamW:
             self.player.draw(self.screen)
             
             # Draw debug grid
-            dG.draw(False, self.screen)
+            dG.draw(True, self.screen)
             
             # Draw active dialog (only if play_intro is True)
             if self.play_intro:
@@ -181,6 +186,9 @@ class DreamW:
             if self.carpetDialog.is_active:
                 self.carpetDialog.draw()
             
+            if self.spotDialog.is_active:
+                self.spotDialog.draw()
+            
             pygame.display.flip()
             
             for event in pygame.event.get():
@@ -193,12 +201,16 @@ class DreamW:
                     if event.key == pygame.K_z:
                         player_grid_index = self.get_player_grid_index()
                         carpet_indices = [103, 104, 120, 119]  # Grid indices for carpet area
-                        
+                        spot_indices = [92,93,109,108]  # Grid indices for spot area
+
                         if player_grid_index == 174 and not self.paperDialog.is_active:
                             self.paperDialog.start_dialog()
                         # Only allow carpet dialog interaction when intro is complete
                         elif player_grid_index in carpet_indices and not self.carpetDialog.is_active and self.all_dialogs_complete:
                             self.carpetDialog.start_dialog()
+                        elif player_grid_index in spot_indices and not self.spotDialog.is_active:
+                            self.spotDialog.start_dialog()
+
                         elif self.dialog.is_active:
                             self.dialog.next()
                         elif self.dialog1.is_active:
@@ -207,6 +219,9 @@ class DreamW:
                             self.paperDialog.next()
                         elif self.carpetDialog.is_active:
                             self.carpetDialog.next()
+                        elif self.spotDialog.is_active:
+                            self.spotDialog.next()
+
                     elif event.key == pygame.K_b:
                         mouse_pos = pygame.mouse.get_pos()
                         index, coords = self.get_grid_pos(mouse_pos)
