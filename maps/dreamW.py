@@ -47,6 +47,19 @@ class DreamW:
             ["Just a spot", None, None, False, False],
             ["You hope it gets erased soon", None, None, False, False]
         ], self.player)
+
+        self.catDialog = Dialog(screen, [
+            ["You see a picture", None, None, False, False],
+            ["It's a cat, maybe...", None, None, False, False],
+            ["She most likely drew you as a cat", None, None, False, False]
+        ], self.player)
+
+        self.mrFaceDialog = Dialog(screen, [
+            ["You see the outline of two eyes and a line that looks like a face", None, None, False, False],
+            ["There is something written on the floor", None, None, False, False],
+            ["''rm. afec''", "Text on the floor", None, False, True],
+            ["You don't understand this", None, None, False, False]
+        ], self.player)
         
         # Add intro sequence properties
         self.sequence_started = False
@@ -141,7 +154,9 @@ class DreamW:
             self.dialog1.is_active,
             self.paperDialog.is_active,
             self.carpetDialog.is_active,
-            self.spotDialog.is_active
+            self.spotDialog.is_active,
+            self.catDialog.is_active,
+            self.mrFaceDialog.is_active
         ])
 
     def check_collision(self, next_x, next_y):
@@ -233,6 +248,11 @@ class DreamW:
             if self.spotDialog.is_active:
                 self.spotDialog.draw()
             
+            if self.catDialog.is_active:
+                self.catDialog.draw()
+            if self.mrFaceDialog.is_active:
+                self.mrFaceDialog.draw()
+            
             pygame.display.flip()
             
             for event in pygame.event.get():
@@ -247,6 +267,7 @@ class DreamW:
                         player_grid_index = self.get_player_grid_index()
                         carpet_indices = [103, 104, 120, 119]  # Grid indices for carpet area
                         spot_indices = [92,93,109,108]  # Grid indices for spot area
+                        mrFace_indices = [113,114,115,129,130,131,132,145,146,147,148]
 
                         if player_grid_index == 174 and not self.paperDialog.is_active:
                             self.paperDialog.start_dialog()
@@ -255,6 +276,11 @@ class DreamW:
                             self.carpetDialog.start_dialog()
                         elif player_grid_index in spot_indices and not self.spotDialog.is_active:
                             self.spotDialog.start_dialog()
+                        elif player_grid_index == 49 and not self.catDialog.is_active:
+                            self.catDialog.start_dialog()
+                        elif player_grid_index in mrFace_indices and not self.mrFaceDialog.is_active:
+                            self.mrFaceDialog.start_dialog()
+                        
 
                         elif self.dialog.is_active:
                             self.dialog.next()
@@ -266,6 +292,10 @@ class DreamW:
                             self.carpetDialog.next()
                         elif self.spotDialog.is_active:
                             self.spotDialog.next()
+                        elif self.catDialog.is_active:
+                            self.catDialog.next()
+                        elif self.mrFaceDialog.is_active:
+                            self.mrFaceDialog.next()
 
                     elif event.key == pygame.K_b:
                         mouse_pos = pygame.mouse.get_pos()
