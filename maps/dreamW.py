@@ -23,8 +23,7 @@ class DreamW:
             ["I'm doing great!", "Character 1", f"{gamePath}/img/avatars/char1.png", False, True]
         ]
         self.dialog = Dialog(screen, dialog_data)
-        self.performing_action = False
-        self.action_timer = 0
+
 
     def draw(self):
         running = True
@@ -34,20 +33,10 @@ class DreamW:
             self.screen.blit(self.background, (0, 0))
             
             # Handle player movement only when no dialog is active
-            if not self.dialog.is_active and not self.performing_action:
+            if not self.dialog.is_active:
                 self.player.move()
                 
             self.player.draw(self.screen)
-            
-            if self.performing_action:
-                if current_time - self.action_timer < 1000:
-                    self.player.direction = 'left'
-                elif current_time - self.action_timer < 2000:
-                    self.player.direction = 'right'
-                else:
-                    self.player.direction = 'down'
-                    self.performing_action = False
-                    self.dialog.is_active = True
             
             # Draw debug grid
             dG.draw(True, self.screen)
