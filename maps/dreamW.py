@@ -30,11 +30,18 @@ class DreamW:
 
         paperDialog_data = [
             ["You picked up the paper", None, None, False, False],
-            [""]
+            ["''ym rdwanisg laawsy ned ta hte ilens''", "Text on paper", None, False, True],
+            ["Maybe, you have dyslexia.", None, None, False, False],
         ]
         
         self.dialog = Dialog(screen, dialog_data)
         self.dialog1 = Dialog(screen, dialog1_data)
+
+        self.paperDialog = Dialog(screen, paperDialog_data)
+        self.carpetDialog = Dialog(screen, [
+            ["Just a carpet with a cute face", None, None, False, False],
+            ["Nothing special", None, None, False, False]
+        ])
         
         # Add intro sequence properties
         self.sequence_started = False
@@ -58,7 +65,7 @@ class DreamW:
         self.dialog1_timer = 0
         self.dialog1_delay = 2000  # 2 seconds in milliseconds
         self.dialog1_started = False
-        self.all_dialogs_complete = False
+        self.all_dialogs_complete = not self.play_intro  # Set to True if play_intro is False
 
     def start_sequence(self, current_time):
         if not self.sequence_started:
@@ -96,6 +103,19 @@ class DreamW:
         if 0 <= grid_x < 16 and 0 <= grid_y < 12:  # Check if within grid bounds
             return index, self.grid[index]
         return None, None
+
+    def get_player_grid_index(self):
+        # Get player's feet position (bottom center of sprite)
+        player_feet_x = self.player.x + self.player.sprite_width // 2
+        player_feet_y = self.player.y + self.player.sprite_height
+        
+        # Convert to grid position
+        grid_x = player_feet_x // self.grid_size
+        grid_y = player_feet_y // self.grid_size
+        
+        # Calculate grid index
+        index = grid_y * 16 + grid_x
+        return index if 0 <= grid_x < 16 and 0 <= grid_y < 12 else None
 
     def draw(self):
         running = True
@@ -142,6 +162,14 @@ class DreamW:
                 elif self.dialog1.is_active:
                     self.dialog1.draw()
             
+            # Add paperDialog drawing
+            if self.paperDialog.is_active:
+                self.paperDialog.draw()
+            
+            # Add carpetDialog drawing
+            if self.carpetDialog.is_active:
+                self.carpetDialog.draw()
+            
             pygame.display.flip()
             
             for event in pygame.event.get():
@@ -152,10 +180,22 @@ class DreamW:
                     
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_z:
-                        if self.dialog.is_active:
+                        player_grid_index = self.get_player_grid_index()
+                        carpet_indices = [103, 104, 120, 119]  # Grid indices for carpet area
+                        
+                        if player_grid_index == 174 and not self.paperDialog.is_active:
+                            self.paperDialog.start_dialog()
+                        # Only allow carpet dialog interaction when intro is complete
+                        elif player_grid_index in carpet_indices and not self.carpetDialog.is_active and self.all_dialogs_complete:
+                            self.carpetDialog.start_dialog()
+                        elif self.dialog.is_active:
                             self.dialog.next()
                         elif self.dialog1.is_active:
                             self.dialog1.next()
+                        elif self.paperDialog.is_active:
+                            self.paperDialog.next()
+                        elif self.carpetDialog.is_active:
+                            self.carpetDialog.next()
                     elif event.key == pygame.K_b:
                         mouse_pos = pygame.mouse.get_pos()
                         index, coords = self.get_grid_pos(mouse_pos)

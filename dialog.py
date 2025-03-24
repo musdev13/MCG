@@ -169,14 +169,23 @@ class Dialog:
         if self.is_text_complete:
             if self.current_index < len(self.dialog_data) - 1:
                 self.current_index += 1
+                # Reset all animation states
                 self.is_text_complete = False
                 self.display_text = ""
                 self.text_counter = 0
+                self.is_paused = False
+                self.pause_timer = 0
+                self.current_text = self.dialog_data[self.current_index][0]
             else:
                 self.close_dialog()
-                self.dialog_ended = True  # Set to True when dialog ends
+                self.dialog_ended = True
         else:
             # If text is not complete, show all text immediately
             self.display_text = self.current_text
             self.is_text_complete = True
+            self.text_counter = len(self.current_text)
+            self.is_paused = False
+
+    def is_dialog_active(self):
+        return self.is_active or self.is_closing
 
