@@ -25,7 +25,7 @@ class DreamW:
         ]
 
         dialog1_data = [
-            ["And... what now?", None, None, False, False]  # Fixed format with all 5 elements
+            ["And... what now?", "Marko", None, False, True]  # Fixed format with all 5 elements
         ]
 
         paperDialog_data = [
