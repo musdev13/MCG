@@ -1,3 +1,4 @@
+from tkinter import N
 import pygame
 from settings import gamePath
 from Player import Player
@@ -59,6 +60,21 @@ class DreamW:
             ["There is something written on the floor", None, None, False, False],
             ["''rm. afec''", "Text on the floor", None, False, True],
             ["You don't understand this", None, None, False, False]
+        ], self.player)
+
+        self.poemDialog = Dialog(screen, [
+            ["''fi oy'uer tslil afllnig,", "...", None, False, True],
+            ["I ekpe acllnig.", "...", None, False, True],
+            ["nad fi no hte raorw", "...", None, False, True],
+            ["htsi iwll ehpl oyu otomrrwo.''", "...", None, False, True],
+            ["...", None, None, False, False],
+            ["You don't understand what it means, but it sounds sad.", None, None, False, False]
+        ], self.player)
+
+        self.ihyDialog = Dialog(screen, [
+            ["''AHET OYU''", "...", None, False, True],
+            ["You think this means ''I love you''", None, None, False, False],
+            ["I love you too!", "Marko", None, False, True]
         ], self.player)
         
         # Add intro sequence properties
@@ -156,7 +172,9 @@ class DreamW:
             self.carpetDialog.is_active,
             self.spotDialog.is_active,
             self.catDialog.is_active,
-            self.mrFaceDialog.is_active
+            self.mrFaceDialog.is_active,
+            self.poemDialog.is_active,
+            self.ihyDialog.is_active
         ])
 
     def check_collision(self, next_x, next_y):
@@ -252,6 +270,10 @@ class DreamW:
                 self.catDialog.draw()
             if self.mrFaceDialog.is_active:
                 self.mrFaceDialog.draw()
+            if self.poemDialog.is_active:
+                self.poemDialog.draw()
+            if self.ihyDialog.is_active:
+                self.ihyDialog.draw()
             
             pygame.display.flip()
             
@@ -268,6 +290,8 @@ class DreamW:
                         carpet_indices = [103, 104, 120, 119]  # Grid indices for carpet area
                         spot_indices = [92,93,109,108]  # Grid indices for spot area
                         mrFace_indices = [113,114,115,129,130,131,132,145,146,147,148]
+                        poem_indices = [9,10,11,12,25,26,27,28,41,42]
+                        ihy_indices = [149,150,151,152,153,154,155,169,170,171,168,167,166]
 
                         if player_grid_index == 174 and not self.paperDialog.is_active:
                             self.paperDialog.start_dialog()
@@ -280,6 +304,10 @@ class DreamW:
                             self.catDialog.start_dialog()
                         elif player_grid_index in mrFace_indices and not self.mrFaceDialog.is_active:
                             self.mrFaceDialog.start_dialog()
+                        elif player_grid_index in poem_indices and not self.poemDialog.is_active:
+                            self.poemDialog.start_dialog()
+                        elif player_grid_index in ihy_indices and not self.ihyDialog.is_active:
+                            self.ihyDialog.start_dialog()
                         
 
                         elif self.dialog.is_active:
@@ -296,6 +324,10 @@ class DreamW:
                             self.catDialog.next()
                         elif self.mrFaceDialog.is_active:
                             self.mrFaceDialog.next()
+                        elif self.poemDialog.is_active:
+                            self.poemDialog.next()
+                        elif self.ihyDialog.is_active:
+                            self.ihyDialog.next()
 
                     elif event.key == pygame.K_b:
                         mouse_pos = pygame.mouse.get_pos()
