@@ -60,7 +60,7 @@ class Player:
             self.animation_timer = pygame.time.get_ticks()
             self.animation_frame = 0
 
-    def move(self):
+    def move(self, level=None):
         if not self.is_moving:  # If movement is disabled, don't process movement
             return
         
@@ -88,8 +88,13 @@ class Player:
             self.direction = 'down'
             self.is_moving = True
 
-        # Check boundaries before applying movement
-        # Allow one grid cell above screen (-48 pixels)
+        # First check collision with level
+        if level and level.check_collision(new_x, new_y):
+            # If collision detected, don't update position
+            self.update_animation()
+            return
+
+        # Then check boundaries
         if new_x >= 0 and new_x <= self.screen_width - self.sprite_width:
             self.x = new_x
         if new_y >= -self.gridSize and new_y <= self.screen_height - self.sprite_height:

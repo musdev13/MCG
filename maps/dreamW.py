@@ -3,6 +3,7 @@ from settings import gamePath
 from Player import Player
 from debugGrid import debugGrid as dG
 from dialog import Dialog
+from pyvidplayer2 import Video
 
 class DreamW:
     def __init__(self, screen, gamePath=gamePath):
@@ -71,6 +72,19 @@ class DreamW:
         self.dialog1_started = False
         self.all_dialogs_complete = not self.play_intro  # Set to True if play_intro is False
 
+        self.videobg = Video(f"{gamePath}/img/dreamW/blackwater.mp4")
+        # self.videobg.set_size((800, 600))
+        # self.videobg.preview()
+        self.videobg.no_audio = True
+
+        self.collisionBlocks = [
+            16,17,1,21,22,80,96,
+            112,128,144,162,163,179,
+            178,183,184,185,186,191,
+            175,143,142,126,79,
+            63,47,30,13
+        ]
+
     def start_sequence(self, current_time):
         if not self.sequence_started:
             self.sequence_started = True
@@ -130,11 +144,41 @@ class DreamW:
             self.spotDialog.is_active
         ])
 
+    def check_collision(self, next_x, next_y):
+        # Calculate feet position (bottom center of sprite)
+        feet_x = next_x + self.player.sprite_width // 2
+        feet_y = next_y + self.player.sprite_height
+        
+        # Convert to grid position
+        grid_x = feet_x // self.grid_size
+        grid_y = feet_y // self.grid_size
+        
+        # Check if feet position is within grid bounds
+        if 0 <= grid_x < 16 and 0 <= grid_y < 12:
+            index = grid_y * 16 + grid_x
+            if index in self.collisionBlocks:
+                return True
+            
+        # Add a small offset check to prevent sliding along walls
+        offset = 10  # Adjust this value as needed
+        for dx in [-offset, offset]:
+            check_x = (feet_x + dx) // self.grid_size
+            if 0 <= check_x < 16:
+                index = grid_y * 16 + check_x
+                if index in self.collisionBlocks:
+                    return True
+                    
+        return False
+
     def draw(self):
         running = True
         while running:
             current_time = pygame.time.get_ticks()
             
+            # Remove parentheses from duration since it's a property
+            if self.videobg.get_pos() >= self.videobg.duration:
+                self.videobg.restart()  # Перезапускаем видео когда оно заканчивается
+            self.videobg.draw(self.screen, (0,0), force_draw=False)
             self.screen.blit(self.background, (0, 0))
             
             # Set player movement based on dialog state
@@ -161,10 +205,10 @@ class DreamW:
                 # Enable player movement only after all dialogs complete
                 elif not self.dialog.is_active and not self.dialog1.is_active and self.dialog1_started:
                     self.all_dialogs_complete = True
-                    self.player.move()
+                    self.player.move(self)
             else:
                 # Let the player's move method handle the movement check
-                self.player.move()
+                self.player.move(self)
             
             self.player.draw(self.screen)
             
@@ -194,6 +238,7 @@ class DreamW:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    self.videobg.close()
                     pygame.quit()
                     return
                     
