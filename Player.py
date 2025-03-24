@@ -61,6 +61,9 @@ class Player:
             self.animation_frame = 0
 
     def move(self):
+        if not self.is_moving:  # If movement is disabled, don't process movement
+            return
+        
         keys = pygame.key.get_pressed()
         self.is_moving = False
         

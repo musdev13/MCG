@@ -2,9 +2,10 @@ import pygame
 from settings import gamePath
 
 class Dialog:
-    def __init__(self, screen, dialog_data):
+    def __init__(self, screen, dialog_data, player=None):
         self.screen = screen
         self.dialog_data = dialog_data
+        self.player = player  # Store player reference
         self.current_index = 0
         self.is_active = False
         self.font_name = pygame.font.Font(f"{gamePath}/Mcg.ttf", 60)  # For character name
@@ -45,10 +46,14 @@ class Dialog:
         self.is_opening = True
         self.current_height = 0
         self.is_closing = False
+        if self.player:
+            self.player.is_moving = False  # Disable player movement when dialog starts
 
     def close_dialog(self):
         self.is_closing = True
         self.is_opening = False
+        if self.player:
+            self.player.is_moving = True  # Enable player movement when dialog ends
 
     def wrap_text(self, text):
         words = text.split(' ')

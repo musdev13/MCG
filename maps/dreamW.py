@@ -34,14 +34,14 @@ class DreamW:
             ["Maybe, you have dyslexia.", None, None, False, False],
         ]
         
-        self.dialog = Dialog(screen, dialog_data)
-        self.dialog1 = Dialog(screen, dialog1_data)
+        self.dialog = Dialog(screen, dialog_data, self.player)
+        self.dialog1 = Dialog(screen, dialog1_data, self.player)
 
-        self.paperDialog = Dialog(screen, paperDialog_data)
+        self.paperDialog = Dialog(screen, paperDialog_data, self.player)
         self.carpetDialog = Dialog(screen, [
             ["Just a carpet with a cute face", None, None, False, False],
             ["Nothing special", None, None, False, False]
-        ])
+        ], self.player)
         
         # Add intro sequence properties
         self.sequence_started = False
@@ -117,12 +117,23 @@ class DreamW:
         index = grid_y * 16 + grid_x
         return index if 0 <= grid_x < 16 and 0 <= grid_y < 12 else None
 
+    def is_any_dialog_active(self):
+        return any([
+            self.dialog.is_active,
+            self.dialog1.is_active,
+            self.paperDialog.is_active,
+            self.carpetDialog.is_active
+        ])
+
     def draw(self):
         running = True
         while running:
             current_time = pygame.time.get_ticks()
             
             self.screen.blit(self.background, (0, 0))
+            
+            # Set player movement based on dialog state
+            self.player.is_moving = not self.is_any_dialog_active()
             
             if self.play_intro:
                 # Handle intro sequence and first dialog
@@ -147,7 +158,7 @@ class DreamW:
                     self.all_dialogs_complete = True
                     self.player.move()
             else:
-                # Skip all intro sequences and enable player movement immediately
+                # Let the player's move method handle the movement check
                 self.player.move()
             
             self.player.draw(self.screen)
