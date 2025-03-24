@@ -33,6 +33,12 @@ class Player:
         }
         self.current_sprite = self.sprites['down']
         self.direction = 'down'
+        
+        # Add screen boundaries
+        self.screen_width = 800  # Total width (16 * 48)
+        self.screen_height = 576  # Total height (12 * 48)
+        self.sprite_width = 96   # Width of player sprite
+        self.sprite_height = 96  # Height of player sprite
 
     def update_animation(self):
         if self.is_moving:
@@ -57,23 +63,34 @@ class Player:
     def move(self):
         keys = pygame.key.get_pressed()
         self.is_moving = False
+        
+        # Store potential new position
+        new_x = self.x
+        new_y = self.y
 
         if keys[pygame.K_LEFT]:
-            self.x -= self.speed
+            new_x = self.x - self.speed
             self.direction = 'left'
             self.is_moving = True
         elif keys[pygame.K_RIGHT]:
-            self.x += self.speed
+            new_x = self.x + self.speed
             self.direction = 'right'
             self.is_moving = True
         if keys[pygame.K_UP]:
-            self.y -= self.speed
+            new_y = self.y - self.speed
             self.direction = 'up'
             self.is_moving = True
         elif keys[pygame.K_DOWN]:
-            self.y += self.speed
+            new_y = self.y + self.speed
             self.direction = 'down'
             self.is_moving = True
+
+        # Check boundaries before applying movement
+        # Allow one grid cell above screen (-48 pixels)
+        if new_x >= 0 and new_x <= self.screen_width - self.sprite_width:
+            self.x = new_x
+        if new_y >= -self.gridSize and new_y <= self.screen_height - self.sprite_height:
+            self.y = new_y
 
         if keys[pygame.K_p]:
             print(f"Player coordinates: x={self.x}, y={self.y}")

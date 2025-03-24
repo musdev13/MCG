@@ -21,6 +21,9 @@ class Dialog:
         self.text_speed = 0.5  # Characters per frame
         self.text_counter = 0
         self.is_text_complete = False
+        self.pause_timer = 0
+        self.pause_duration = 100  # Pause duration in milliseconds for commas
+        self.is_paused = False
         
         # Create dialog box surface with transparency
         self.dialog_surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
@@ -116,10 +119,26 @@ class Dialog:
             
             # Gradually reveal text
             if not self.is_text_complete:
-                self.text_counter += self.text_speed
-                self.display_text = self.current_text[:int(self.text_counter)]
-                if len(self.display_text) >= len(self.current_text):
-                    self.is_text_complete = True
+                current_time = pygame.time.get_ticks()
+                
+                # Check if we need to pause at a comma
+                current_char_index = int(self.text_counter)
+                if current_char_index > 0 and current_char_index < len(self.current_text):
+                    if self.current_text[current_char_index - 1] == ',':
+                        if not self.is_paused:
+                            self.pause_timer = current_time
+                            self.is_paused = True
+                        elif current_time - self.pause_timer < self.pause_duration:
+                            # Just keep current text during pause, but don't return
+                            self.display_text = self.current_text[:current_char_index]
+                        else:
+                            self.is_paused = False
+                
+                if not self.is_paused:
+                    self.text_counter += self.text_speed
+                    self.display_text = self.current_text[:int(self.text_counter)]
+                    if len(self.display_text) >= len(self.current_text):
+                        self.is_text_complete = True
 
             # Scale positions based on current animation height
             scale_factor = self.current_height / self.height
