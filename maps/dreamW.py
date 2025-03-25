@@ -1,4 +1,3 @@
-from tkinter import N
 import pygame
 from settings import gamePath
 from Player import Player
@@ -8,7 +7,7 @@ from pyvidplayer2 import Video
 
 class DreamW:
     def __init__(self, screen, gamePath=gamePath):
-        self.play_intro = False  # New flag to control intro sequence and dialogs
+        self.play_intro = True  # New flag to control intro sequence and dialogs
         self.screen = screen
         self.background = pygame.image.load(f"{gamePath}/img/dreamW/bg.png")
         self.grid_size = 48
@@ -76,6 +75,13 @@ class DreamW:
             ["You think this means ''I love you''", None, None, False, False],
             ["I love you too!", "Marko", None, False, True]
         ], self.player)
+
+        self.homeDialog = Dialog(screen, [
+            ["This was your house.", None, None, False, False],
+            ["unfortunately, that entrance is not available ", None, None, False, False],
+            ["It's a good thing I made an alternate entrance in the lower left corner.", "Marko", None, False, True],
+            ["It may not be visible, but it's there.", "Marko", None, False, True]
+        ], self.player)
         
         # Add intro sequence properties
         self.sequence_started = False
@@ -113,6 +119,13 @@ class DreamW:
             175,143,142,126,79,
             63,47,30,13
         ]
+
+        # Add cutscene properties
+        self.cutscene_active = False
+        self.cutscene_start_time = 0
+        self.fade_surface = pygame.Surface((800, 600))
+        self.fade_surface.fill((0, 0, 0))
+        self.fade_alpha = 0
 
     def start_sequence(self, current_time):
         if not self.sequence_started:
@@ -174,7 +187,8 @@ class DreamW:
             self.catDialog.is_active,
             self.mrFaceDialog.is_active,
             self.poemDialog.is_active,
-            self.ihyDialog.is_active
+            self.ihyDialog.is_active,
+            self.homeDialog.is_active
         ])
 
     def check_collision(self, next_x, next_y):
@@ -203,45 +217,68 @@ class DreamW:
                     
         return False
 
+    def handle_cutscene(self, current_time):
+        if not self.cutscene_start_time:
+            self.cutscene_start_time = current_time
+            self.player.is_moving = False
+            return True
+
+        elapsed = current_time - self.cutscene_start_time
+        
+        if elapsed < 2000:  # First 2 seconds - just wait
+            return True
+        elif elapsed < 5000:  # Next 3 seconds - fade to black
+            self.fade_alpha = min(255, int((elapsed - 2000) / 3000 * 255))
+            self.fade_surface.set_alpha(self.fade_alpha)
+            self.screen.blit(self.fade_surface, (0, 0))
+            return True
+        elif elapsed < 8000:  # Next 3 seconds - black screen
+            self.screen.blit(self.fade_surface, (0, 0))
+            return True
+        else:  # After 8 seconds
+            pygame.quit()  # or pass if you want to continue
+            return False
+
     def draw(self):
         running = True
         while running:
             current_time = pygame.time.get_ticks()
             
-            # Remove parentheses from duration since it's a property
+            # Video background handling
             if self.videobg.get_pos() >= self.videobg.duration:
-                self.videobg.restart()  # Перезапускаем видео когда оно заканчивается
+                self.videobg.restart()
             self.videobg.draw(self.screen, (0,0), force_draw=False)
             self.screen.blit(self.background, (0, 0))
             
-            # Set player movement based on dialog state
-            self.player.is_moving = not self.is_any_dialog_active()
+            # Set player movement based on dialog state AND cutscene state
+            self.player.is_moving = not (self.is_any_dialog_active() or self.cutscene_active)
             
-            if self.play_intro:
-                # Handle intro sequence and first dialog
-                sequence_total_time = sum(self.sequence_times)
-                if not self.sequence_started or current_time - self.sequence_start_time < sequence_total_time:
-                    self.start_sequence(current_time)
-                    self.player.is_moving = False
-                elif not self.dialog.is_active and self.sequence_started and not self.post_sequence_dialog_shown:
-                    self.dialog.start_dialog()
-                    self.player.is_moving = False
-                    self.post_sequence_dialog_shown = True
-                # Handle second dialog after delay
-                elif self.dialog.dialog_ended and not self.dialog1_started:
-                    if self.dialog1_timer == 0:
-                        self.dialog1_timer = current_time
-                    elif current_time - self.dialog1_timer >= self.dialog1_delay:
-                        self.dialog1.current_index = 0
-                        self.dialog1.start_dialog()
-                        self.dialog1_started = True
-                # Enable player movement only after all dialogs complete
-                elif not self.dialog.is_active and not self.dialog1.is_active and self.dialog1_started:
-                    self.all_dialogs_complete = True
+            # Only allow movement if not in cutscene
+            if not self.cutscene_active:
+                if self.play_intro:
+                    # Handle intro sequence and first dialog
+                    sequence_total_time = sum(self.sequence_times)
+                    if not self.sequence_started or current_time - self.sequence_start_time < sequence_total_time:
+                        self.start_sequence(current_time)
+                        self.player.is_moving = False
+                    elif not self.dialog.is_active and self.sequence_started and not self.post_sequence_dialog_shown:
+                        self.dialog.start_dialog()
+                        self.player.is_moving = False
+                        self.post_sequence_dialog_shown = True
+                    # Handle second dialog after delay
+                    elif self.dialog.dialog_ended and not self.dialog1_started:
+                        if self.dialog1_timer == 0:
+                            self.dialog1_timer = current_time
+                        elif current_time - self.dialog1_timer >= self.dialog1_delay:
+                            self.dialog1.current_index = 0
+                            self.dialog1.start_dialog()
+                            self.dialog1_started = True
+                    # Enable player movement only after all dialogs complete
+                    elif not self.dialog.is_active and not self.dialog1.is_active and self.dialog1_started:
+                        self.all_dialogs_complete = True
+                        self.player.move(self)
+                else:
                     self.player.move(self)
-            else:
-                # Let the player's move method handle the movement check
-                self.player.move(self)
             
             self.player.draw(self.screen)
             
@@ -275,6 +312,12 @@ class DreamW:
             if self.ihyDialog.is_active:
                 self.ihyDialog.draw()
             
+            if self.homeDialog.is_active:
+                self.homeDialog.draw()
+            
+            if self.cutscene_active:
+                self.cutscene_active = self.handle_cutscene(current_time)
+
             pygame.display.flip()
             
             for event in pygame.event.get():
@@ -292,8 +335,15 @@ class DreamW:
                         mrFace_indices = [113,114,115,129,130,131,132,145,146,147,148]
                         poem_indices = [9,10,11,12,25,26,27,28,41,42]
                         ihy_indices = [149,150,151,152,153,154,155,169,170,171,168,167,166]
+                        homeDialog_indices = [180,181,182]
 
-                        if player_grid_index == 174 and not self.paperDialog.is_active:
+                        # Add this new condition before other dialog checks
+
+                        if player_grid_index == 177:
+                            print("нажато")
+                            self.cutscene_active = True
+                            self.cutscene_start_time = 0
+                        elif player_grid_index == 174 and not self.paperDialog.is_active:
                             self.paperDialog.start_dialog()
                         # Only allow carpet dialog interaction when intro is complete
                         elif player_grid_index in carpet_indices and not self.carpetDialog.is_active and self.all_dialogs_complete:
@@ -308,6 +358,8 @@ class DreamW:
                             self.poemDialog.start_dialog()
                         elif player_grid_index in ihy_indices and not self.ihyDialog.is_active:
                             self.ihyDialog.start_dialog()
+                        elif player_grid_index in homeDialog_indices and not self.homeDialog.is_active:
+                            self.homeDialog.start_dialog()
                         
 
                         elif self.dialog.is_active:
@@ -328,6 +380,8 @@ class DreamW:
                             self.poemDialog.next()
                         elif self.ihyDialog.is_active:
                             self.ihyDialog.next()
+                        elif self.homeDialog.is_active:
+                            self.homeDialog.next()
 
                     elif event.key == pygame.K_b:
                         mouse_pos = pygame.mouse.get_pos()

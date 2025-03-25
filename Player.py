@@ -61,7 +61,8 @@ class Player:
             self.animation_frame = 0
 
     def move(self, level=None):
-        if not self.is_moving:  # If movement is disabled, don't process movement
+        # Add cutscene check at the start of move method
+        if not self.is_moving or (level and level.cutscene_active):
             return
         
         keys = pygame.key.get_pressed()

@@ -36,7 +36,7 @@ while running:
     # Обновление экрана
     # pygame.time.Clock().tick(30)
     pygame.display.flip()
-    clock.tick(30)
+    # clock.tick(30)
     
 
 # Завершение работы Pygame
