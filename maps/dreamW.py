@@ -1,5 +1,5 @@
 import pygame
-from settings import gamePath
+from settings import gamePath, Level
 from Player import Player
 from debugGrid import debugGrid as dG
 from dialog import Dialog
@@ -127,6 +127,8 @@ class DreamW:
         self.fade_surface.fill((0, 0, 0))
         self.fade_alpha = 0
 
+        self.running = True
+
     def start_sequence(self, current_time):
         if not self.sequence_started:
             self.sequence_started = True
@@ -236,12 +238,11 @@ class DreamW:
             self.screen.blit(self.fade_surface, (0, 0))
             return True
         else:  # After 8 seconds
-            pygame.quit()  # or pass if you want to continue
-            return False
+            self.running = False
+            Level.levelName = "dCat"
 
     def draw(self):
-        running = True
-        while running:
+        while self.running:
             current_time = pygame.time.get_ticks()
             
             # Video background handling
@@ -318,11 +319,12 @@ class DreamW:
             if self.cutscene_active:
                 self.cutscene_active = self.handle_cutscene(current_time)
 
-            pygame.display.flip()
+            if Level.levelName == "dreamW":
+                pygame.display.flip()
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
                     self.videobg.close()
                     pygame.quit()
                     return

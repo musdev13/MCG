@@ -8,4 +8,7 @@ class LController:
         if levelName == "intro":
             from maps.intro import intro as map
         
+        if levelName == "dCat":
+            from maps.dCat import dCat as map
+        
         return map(screen).draw()

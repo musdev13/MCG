@@ -165,6 +165,16 @@ class Dialog:
                 except:
                     print(f"Could not load avatar: {avatar_path}")
 
+            # Add Z indicator in bottom-right corner
+            if self.is_text_complete:
+                z_font = pygame.font.Font(f"{gamePath}/Mcg.ttf", 48)  # Increased font size from 32 to 48
+                z_surface = z_font.render("z", True, (255, 255, 255))
+                z_pos = (
+                    self.width - z_surface.get_width() - 30,  # Increased padding from 20 to 30
+                    self.current_height - z_surface.get_height() - 20  # Increased padding from 10 to 20
+                )
+                current_surface.blit(z_surface, z_pos)
+
         # Draw the animated surface
         y_pos = 600 - self.current_height  # Adjust position based on current height
         self.screen.blit(current_surface, (0, y_pos))

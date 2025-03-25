@@ -12,11 +12,11 @@ clock = pygame.time.Clock()
 
 # Создание окна
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Marko Corner")
+pygame.display.set_caption("")
 
 
 # background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # Масштабирование под размер окна
-Level.levelName = "dreamW"
+Level.levelName = "intro"
 
 
 # Основной цикл программы
@@ -35,7 +35,7 @@ while running:
     
     # Обновление экрана
     # pygame.time.Clock().tick(30)
-    pygame.display.flip()
+    # pygame.display.flip()
     # clock.tick(30)
     
 
