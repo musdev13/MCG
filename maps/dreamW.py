@@ -7,7 +7,7 @@ from pyvidplayer2 import Video
 
 class dreamW:
     def __init__(self, screen, gamePath=gamePath):
-        self.play_intro = True  # New flag to control intro sequence and dialogs
+        self.play_intro = False  # New flag to control intro sequence and dialogs
         self.screen = screen
         self.background = pygame.image.load(f"{gamePath}/img/dreamW/bg.png")
         self.grid_size = 48

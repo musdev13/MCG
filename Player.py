@@ -2,11 +2,12 @@ import pygame
 from settings import playerSpeed, gamePath
 
 class Player:
-    def __init__(self, x, y, angle):
+    def __init__(self, x, y, angle, skin_type="marko"):
         self.x = x
         self.y = y
         self.speed = playerSpeed
         self.angle = angle
+        self.skin_type = skin_type  # Add skin type parameter
         self.canMove = True
         self.targetX = x
         self.targetY = y
@@ -16,20 +17,21 @@ class Player:
         self.animation_frame = 0
         self.is_moving = False
         
-        # Load player sprites
+        # Load player sprites based on skin type
+        sprite_path = f"{gamePath}/img/player/{'d/' if skin_type == 'd' else ''}idle_"
         self.sprites = {
-            'up': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_u.png"), (96, 96)),
-            'up1': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_u1.png"), (96, 96)),
-            'up2': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_u2.png"), (96, 96)),
-            'down': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_d.png"), (96, 96)),
-            'down1': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_d1.png"), (96, 96)),
-            'down2': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_d2.png"), (96, 96)),
-            'left': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_l.png"), (96, 96)),
-            'left1': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_l1.png"), (96, 96)),
-            'left2': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_l2.png"), (96, 96)),
-            'right': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_r.png"), (96, 96)),
-            'right1': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_r1.png"), (96, 96)),
-            'right2': pygame.transform.scale(pygame.image.load(f"{gamePath}/img/player/idle_r2.png"), (96, 96))
+            'up': pygame.transform.scale(pygame.image.load(f"{sprite_path}u.png"), (96, 96)),
+            'up1': pygame.transform.scale(pygame.image.load(f"{sprite_path}u1.png"), (96, 96)),
+            'up2': pygame.transform.scale(pygame.image.load(f"{sprite_path}u2.png"), (96, 96)),
+            'down': pygame.transform.scale(pygame.image.load(f"{sprite_path}d.png"), (96, 96)),
+            'down1': pygame.transform.scale(pygame.image.load(f"{sprite_path}d1.png"), (96, 96)),
+            'down2': pygame.transform.scale(pygame.image.load(f"{sprite_path}d2.png"), (96, 96)),
+            'left': pygame.transform.scale(pygame.image.load(f"{sprite_path}l.png"), (96, 96)),
+            'left1': pygame.transform.scale(pygame.image.load(f"{sprite_path}l1.png"), (96, 96)),
+            'left2': pygame.transform.scale(pygame.image.load(f"{sprite_path}l2.png"), (96, 96)),
+            'right': pygame.transform.scale(pygame.image.load(f"{sprite_path}r.png"), (96, 96)),
+            'right1': pygame.transform.scale(pygame.image.load(f"{sprite_path}r1.png"), (96, 96)),
+            'right2': pygame.transform.scale(pygame.image.load(f"{sprite_path}r2.png"), (96, 96))
         }
         self.current_sprite = self.sprites['down']
         self.direction = 'down'
