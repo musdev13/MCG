@@ -321,6 +321,7 @@ class dreamW:
 
             if Level.levelName == "dreamW":
                 pygame.display.flip()
+                pygame.time.Clock().tick(120)
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

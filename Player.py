@@ -63,49 +63,70 @@ class Player:
             self.animation_frame = 0
 
     def move(self, level=None):
-        # Add cutscene check at the start of move method
-        if not self.is_moving or (level and level.cutscene_active):
+        # First check if we have a valid level and can move
+        if not level or not self.is_moving:
+            print(f"Movement blocked: level={bool(level)}, is_moving={self.is_moving}")
             return
         
         keys = pygame.key.get_pressed()
-        self.is_moving = False
         
         # Store potential new position
         new_x = self.x
         new_y = self.y
 
+        # Check for any active dialogs or cutscenes
+        dialog_active = False
+        if hasattr(level, 'dialog'):
+            dialog_active = getattr(level.dialog, 'active', False)
+        if hasattr(level, 'dialog1'):
+            dialog_active = dialog_active or getattr(level.dialog1, 'active', False)
+        if hasattr(level, 'paperDialog'):
+            dialog_active = dialog_active or getattr(level.paperDialog, 'active', False)
+        
+        # Block movement if dialog or cutscene is active
+        if level.cutscene_active or dialog_active:
+            print(f"Movement blocked: cutscene={level.cutscene_active}, dialog={dialog_active}")
+            self.is_moving = False
+            return
+
+        self.is_moving = False  # Reset movement state
+        
         if keys[pygame.K_LEFT]:
+            print("Left key pressed")
             new_x = self.x - self.speed
             self.direction = 'left'
             self.is_moving = True
         elif keys[pygame.K_RIGHT]:
+            print("Right key pressed")
             new_x = self.x + self.speed
             self.direction = 'right'
             self.is_moving = True
         if keys[pygame.K_UP]:
+            print("Up key pressed")
             new_y = self.y - self.speed
             self.direction = 'up'
             self.is_moving = True
         elif keys[pygame.K_DOWN]:
+            print("Down key pressed")
             new_y = self.y + self.speed
             self.direction = 'down'
             self.is_moving = True
 
-        # First check collision with level
-        if level and level.check_collision(new_x, new_y):
-            # If collision detected, don't update position
-            self.update_animation()
-            return
-
-        # Then check boundaries
-        if new_x >= 0 and new_x <= self.screen_width - self.sprite_width:
+        # If we're moving and there's no collision, update position
+        if self.is_moving and (not level or not level.check_collision(new_x, new_y)):
             self.x = new_x
-        if new_y >= -self.gridSize and new_y <= self.screen_height - self.sprite_height:
             self.y = new_y
 
-        if keys[pygame.K_p]:
-            print(f"Player coordinates: x={self.x}, y={self.y}")
-            
+            # Check boundaries
+            if self.x < 0:
+                self.x = 0
+            elif self.x > self.screen_width - self.sprite_width:
+                self.x = self.screen_width - self.sprite_width
+            if self.y < -self.gridSize:
+                self.y = -self.gridSize
+            elif self.y > self.screen_height - self.sprite_height:
+                self.y = self.screen_height - self.sprite_height
+
         self.update_animation()
     
     def draw(self, screen):
