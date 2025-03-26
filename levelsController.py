@@ -2,13 +2,10 @@
 
 class LController:
     def loadLevel(levelName, screen):
-        if levelName == "dreamW":
-            from maps.dreamW import DreamW as map
-            
-        if levelName == "intro":
-            from maps.intro import intro as map
-        
-        if levelName == "dCat":
-            from maps.dCat import dCat as map
-        
+        try:
+            module = __import__(f'maps.{levelName}', fromlist=[levelName])
+            map = getattr(module, levelName)
+        except (ImportError, AttributeError):
+            raise ValueError(f"Level '{levelName}' not found")
+
         return map(screen).draw()

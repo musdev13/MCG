@@ -5,7 +5,7 @@ from debugGrid import debugGrid as dG
 from dialog import Dialog
 from pyvidplayer2 import Video
 
-class DreamW:
+class dreamW:
     def __init__(self, screen, gamePath=gamePath):
         self.play_intro = True  # New flag to control intro sequence and dialogs
         self.screen = screen
