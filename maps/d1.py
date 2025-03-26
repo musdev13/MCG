@@ -12,6 +12,8 @@ class d1:
         self.cutscene_active = False
         self.dialog = None  # Add dialog property
 
+        self.bg_image = pygame.image.load(f"{gamePath}/img/d1/bg.png")
+
         # Create grid properly
         for y in range(12):
             row = []
@@ -53,19 +55,29 @@ class d1:
                 self.dialog is not None and 
                 getattr(self.dialog, 'is_active', False))
 
+    def get_grid_pos(self, mouse_pos):
+        mx, my = mouse_pos
+        grid_x = mx // self.grid_size
+        grid_y = my // self.grid_size
+        index = grid_y * 16 + grid_x  # 16 is the number of columns
+        if 0 <= grid_x < 16 and 0 <= grid_y < 12:  # Check if within grid bounds
+            return index, self.grid[grid_y][grid_x]
+        return None, None
+
     def draw(self):
         while self.running:
-            self.screen.fill((255, 255, 255))
+            
+            self.screen.blit(self.bg_image, (0, 0))
             
             # Draw debug grid
-            dG.draw(True, self.screen)
+            dG.draw(False, self.screen)
             
             # Set player movement based on dialog state AND cutscene state
             self.player.is_moving = not (self.is_any_dialog_active() or self.cutscene_active)
             
             # Only move player if not in cutscene or dialog
             if not self.cutscene_active and not self.is_any_dialog_active():
-                print("Movement state:", self.player.is_moving)
+                # print("Movement state:", self.player.is_moving)
                 self.player.move(self)
             
             self.player.draw(self.screen)
@@ -82,3 +94,9 @@ class d1:
                 if event.type == pygame.QUIT:
                     self.running = False
                     pygame.quit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_b:
+                        mouse_pos = pygame.mouse.get_pos()
+                        index, coords = self.get_grid_pos(mouse_pos)
+                        if index is not None:
+                            print(f"Grid Index: {index}, Coordinates: {coords}")
