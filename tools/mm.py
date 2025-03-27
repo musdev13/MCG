@@ -354,7 +354,8 @@ class MapMaker:
                     "player_skin": self.skin_var.get(),
                     "player_spawn": self.player_spawn,
                     "cells": self.cells,
-                    "dialog_groups": self.dialog_groups
+                    "dialog_groups": self.dialog_groups,
+                    "startup_script": self.script_text.get("1.0", tk.END).strip()  # Save script
                 }
                 
                 # Create map directory if it doesn't exist
@@ -388,7 +389,6 @@ class MapMaker:
             if not file_path:
                 return
                 
-            # Use context manager to ensure file is closed
             with open(file_path, "r") as f:
                 map_data = json.load(f)
             
@@ -423,6 +423,13 @@ class MapMaker:
                 self.draw_grid()
                 self.redraw_cells()
                 self.update_dialog_group_list()
+
+                # Load script
+                if "startup_script" in map_data:
+                    self.script_text.delete("1.0", tk.END)
+                    self.script_text.insert("1.0", map_data["startup_script"])
+                else:
+                    self.script_text.delete("1.0", tk.END)
                 
         except Exception as e:
             tk.messagebox.showerror("Error", f"Failed to load map: {str(e)}")

@@ -383,5 +383,6 @@
             ],
             "cells": []
         }
-    }
+    },
+    "startup_script": "playerCantMove();\nfadeIn(3);\nwait(2);\ndialog(\"intro\");\nplayerCanMove();"
 }
