@@ -264,9 +264,16 @@
             "y": 10
         },
         "38": {
-            "type": "normal",
+            "type": "dialog",
             "x": 6,
-            "y": 2
+            "y": 2,
+            "dialog_group": "firstpaper"
+        },
+        "39": {
+            "type": "dialog",
+            "x": 7,
+            "y": 2,
+            "dialog_group": "firstpaper"
         }
     },
     "dialog_groups": {
