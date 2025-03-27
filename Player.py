@@ -113,7 +113,7 @@ class Player:
             self.is_moving = True
 
         # If we're moving and there's no collision, update position
-        if self.is_moving and (not level or not level.check_collision(new_x, new_y)):
+        if self.is_moving and (not level or not self.check_collision(level, new_x, new_y)):
             self.x = new_x
             self.y = new_y
 
@@ -128,6 +128,49 @@ class Player:
                 self.y = self.screen_height - self.sprite_height
 
         self.update_animation()
+
+    def check_collision(self, level, next_x, next_y):
+        """Check collision for multiple points along player's width"""
+        # Height of collision box (8 pixels up from feet)
+        collision_height = 8
+        
+        # Check points along bottom of player (full width)
+        feet_y = next_y + self.sprite_height
+        
+        # Check multiple x positions (wider coverage)
+        check_points = [
+            # Bottom points
+            (next_x + 24, feet_y),              # Far Left
+            (next_x + 40, feet_y),              # Left
+            (next_x + self.sprite_width//2, feet_y),  # Center
+            (next_x + 56, feet_y),              # Right
+            (next_x + 72, feet_y),              # Far Right
+            
+            # Points 8 pixels above feet
+            (next_x + 24, feet_y - collision_height),
+            (next_x + 40, feet_y - collision_height),
+            (next_x + self.sprite_width//2, feet_y - collision_height),
+            (next_x + 56, feet_y - collision_height),
+            (next_x + 72, feet_y - collision_height),
+            
+            # Additional middle height points (4 pixels up)
+            (next_x + 24, feet_y - collision_height//2),
+            (next_x + 40, feet_y - collision_height//2),
+            (next_x + self.sprite_width//2, feet_y - collision_height//2),
+            (next_x + 56, feet_y - collision_height//2),
+            (next_x + 72, feet_y - collision_height//2),
+        ]
+        
+        for x, y in check_points:
+            grid_x = x // level.grid_size
+            grid_y = y // level.grid_size
+            
+            if 0 <= grid_x < 16 and 0 <= grid_y < 12:
+                index = grid_y * 16 + grid_x
+                if index in level.collisionBlocks:
+                    return True
+                    
+        return False
     
     def draw(self, screen):
         screen.blit(self.current_sprite, (self.x, self.y))

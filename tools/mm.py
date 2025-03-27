@@ -464,31 +464,117 @@ class MapMaker:
         dialog.title(f"Edit Dialog Group: {self.current_dialog_group}")
         dialog.grab_set()
 
+        # Add rename and delete buttons at the top
+        control_frame = ttk.Frame(dialog)
+        control_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(
+            control_frame,
+            text="Rename Group",
+            command=lambda: self.rename_dialog_group(dialog)
+        ).pack(side=tk.LEFT, padx=2)
+        
+        ttk.Button(
+            control_frame,
+            text="Delete Group",
+            command=lambda: self.delete_dialog_group(dialog)
+        ).pack(side=tk.LEFT, padx=2)
+
         # Dialog list frame
         dialog_list_frame = ttk.LabelFrame(dialog, text="Dialogs")
         dialog_list_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        # Dialog list
-        dialogs = self.dialog_groups[self.current_dialog_group]["dialogs"]
-        for i, d in enumerate(dialogs):
-            frame = ttk.Frame(dialog_list_frame)
-            frame.pack(fill=tk.X, pady=2)
-            ttk.Label(frame, text=f"Dialog {i+1}:").pack(side=tk.LEFT)
-            ttk.Label(frame, text=d["text"][:30] + "...").pack(side=tk.LEFT)
-            ttk.Button(
-                frame, 
-                text="Edit",
-                command=lambda idx=i: self.edit_dialog(idx)
-            ).pack(side=tk.RIGHT)
+        def refresh_dialog_list():
+            # Clear existing widgets
+            for widget in dialog_list_frame.winfo_children():
+                widget.destroy()
+                
+            # Redraw dialog list
+            dialogs = self.dialog_groups[self.current_dialog_group]["dialogs"]
+            for i, d in enumerate(dialogs):
+                frame = ttk.Frame(dialog_list_frame)
+                frame.pack(fill=tk.X, pady=2)
+                ttk.Label(frame, text=f"Dialog {i+1}:").pack(side=tk.LEFT)
+                ttk.Label(frame, text=d["text"][:30] + "...").pack(side=tk.LEFT)
+                
+                button_frame = ttk.Frame(frame)
+                button_frame.pack(side=tk.RIGHT)
+                
+                ttk.Button(
+                    button_frame,
+                    text="Edit",
+                    command=lambda idx=i: self.edit_dialog(idx, refresh_dialog_list)
+                ).pack(side=tk.LEFT, padx=2)
+                
+                ttk.Button(
+                    button_frame,
+                    text="Delete",
+                    command=lambda idx=i: self.delete_dialog(idx, refresh_dialog_list)
+                ).pack(side=tk.LEFT, padx=2)
+
+        refresh_dialog_list()
 
         # Add new dialog button
         ttk.Button(
             dialog,
             text="Add New Dialog",
-            command=lambda: self.edit_dialog(len(dialogs))
+            command=lambda: self.edit_dialog(len(self.dialog_groups[self.current_dialog_group]["dialogs"]), refresh_dialog_list)
         ).pack(fill=tk.X, pady=5)
 
-    def edit_dialog(self, index):
+    def rename_dialog_group(self, parent_dialog):
+        dialog = tk.Toplevel(parent_dialog)
+        dialog.title("Rename Dialog Group")
+        dialog.grab_set()
+
+        ttk.Label(dialog, text="New Name:").pack(pady=5)
+        name_var = tk.StringVar(value=self.current_dialog_group)
+        ttk.Entry(dialog, textvariable=name_var).pack(pady=5)
+
+        def save():
+            new_name = name_var.get()
+            if new_name and new_name != self.current_dialog_group:
+                # Copy group data to new name
+                self.dialog_groups[new_name] = self.dialog_groups[self.current_dialog_group]
+                # Delete old group
+                del self.dialog_groups[self.current_dialog_group]
+                # Update current group
+                self.current_dialog_group = new_name
+                # Update UI
+                self.update_dialog_group_list()
+                self.dialog_group_var.set(new_name)
+                # Close both dialogs
+                dialog.destroy()
+                parent_dialog.destroy()
+                # Reopen edit dialog with new name
+                self.edit_dialog_group()
+
+        ttk.Button(dialog, text="Save", command=save).pack(pady=5)
+
+    def delete_dialog_group(self, parent_dialog):
+        if tk.messagebox.askyesno("Confirm Delete", f"Delete dialog group '{self.current_dialog_group}'?"):
+            # Remove all cells associated with this group
+            cells_to_remove = []
+            for index, cell in self.cells.items():
+                if cell.get("type") == "dialog" and cell.get("dialog_group") == self.current_dialog_group:
+                    cells_to_remove.append(index)
+            
+            for index in cells_to_remove:
+                del self.cells[index]
+                self.canvas.delete(f"cell_{index}")
+            
+            # Delete the group
+            del self.dialog_groups[self.current_dialog_group]
+            self.current_dialog_group = None
+            self.dialog_group_var.set("")
+            self.update_dialog_group_list()
+            parent_dialog.destroy()
+
+    def delete_dialog(self, index, refresh_callback):
+        if tk.messagebox.askyesno("Confirm Delete", "Delete this dialog?"):
+            del self.dialog_groups[self.current_dialog_group]["dialogs"][index]
+            refresh_callback()
+
+    def edit_dialog(self, index, refresh_callback=None):
         dialog = tk.Toplevel(self.root)
         dialog.title("Edit Dialog")
         dialog.grab_set()
@@ -529,6 +615,8 @@ class MapMaker:
             else:
                 group["dialogs"].append(dialog_data)
             dialog.destroy()
+            if refresh_callback:
+                refresh_callback()
 
         ttk.Button(dialog, text="Save", command=save).pack(pady=5)
 

@@ -87,7 +87,7 @@ class d1:
 
             if Level.levelName == "d1":
                 pygame.display.flip()
-                # pygame.time.Clock().tick(120)
+                #pygame.time.Clock().tick(120)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -101,6 +101,16 @@ class d1:
                         if player_grid_index in [56, 57] and not self.second_papers.is_active:
                             self.second_papers.start_dialog()
                         elif self.firstpaper.is_active:
-                            self.firstpaper.next()
+                            # Check if this is the last dialog
+                            if self.firstpaper.current_dialog_index == len(self.firstpaper.dialogs) - 1:
+                                self.firstpaper.next()
+                                self.firstpaper.current_dialog_index = 0  # Reset index
+                            else:
+                                self.firstpaper.next()
                         elif self.second_papers.is_active:
-                            self.second_papers.next()
+                            # Check if this is the last dialog
+                            if self.second_papers.current_dialog_index == len(self.second_papers.dialogs) - 1:
+                                self.second_papers.next()
+                                self.second_papers.current_dialog_index = 0  # Reset index
+                            else:
+                                self.second_papers.next()
