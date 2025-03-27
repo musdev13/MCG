@@ -622,13 +622,13 @@
             "type": "script",
             "x": 10,
             "y": 10,
-            "script": "wait(2)\ndialog(\"intro\")"
+            "script": "wait(2); dialog(\"intro\");"
         },
         "170": {
             "type": "script",
             "x": 10,
             "y": 10,
-            "script": "wait(2); dialog(\"intro\");"
+            "script_group": "door"
         }
     },
     "dialog_groups": {
@@ -862,5 +862,13 @@
             ]
         }
     },
-    "startup_script": "playerCantMove();\nfadeIn(3);\nwait(2);\ndialog(\"intro\");\nwait(2);\ndialog(\"intro1\");\nwait(3);\ndialog(\"intro2\");\nplayerCanMove();"
+    "startup_script": "playerCantMove();\nfadeIn(3);\nwait(2);\ndialog(\"intro\");\nwait(2);\ndialog(\"intro1\");\nwait(3);\ndialog(\"intro2\");\nplayerCanMove();",
+    "script_groups": {
+        "door": {
+            "script": "wait(2); dialog(\"intro\");",
+            "cells": [
+                170
+            ]
+        }
+    }
 }

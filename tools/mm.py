@@ -24,6 +24,8 @@ class MapMaker:
         self.map_name = None  # Add this line to store map name
         self.dialog_groups = {}  # Dictionary to store dialog groups
         self.current_dialog_group = None
+        self.script_groups = {}  # Dictionary to store script groups
+        self.current_script_group = None
         self.setup_ui()
         
     def setup_ui(self):
@@ -159,6 +161,34 @@ class MapMaker:
             script_frame,
             text="Show Commands Help",
             command=self.show_script_help
+        ).pack(fill=tk.X, pady=2)
+
+        # After dialog group frame, add script group frame
+        script_group_frame = ttk.LabelFrame(self.tools_frame, text="Script Groups")
+        script_group_frame.pack(fill=tk.X, pady=5, padx=2)
+
+        # Create new script group
+        ttk.Button(
+            script_group_frame,
+            text="New Script Group",
+            command=self.create_script_group
+        ).pack(fill=tk.X, pady=2)
+
+        # Script group selector
+        self.script_group_var = tk.StringVar()
+        self.script_group_combo = ttk.Combobox(
+            script_group_frame,
+            textvariable=self.script_group_var,
+            state="readonly"
+        )
+        self.script_group_combo.pack(fill=tk.X, pady=2)
+        self.script_group_combo.bind('<<ComboboxSelected>>', self.on_script_group_selected)
+
+        # Edit script group button
+        ttk.Button(
+            script_group_frame,
+            text="Edit Script Group",
+            command=self.edit_script_group
         ).pack(fill=tk.X, pady=2)
         
     def draw_grid(self):
@@ -300,7 +330,24 @@ class MapMaker:
                 self.draw_cell(x, y, "blue", cell_index)
                 
             elif self.current_tool == "script":
-                self.edit_script_trigger(cell_index, x, y)
+                if not self.current_script_group:
+                    tk.messagebox.showerror("Error", "Please select a script group first!")
+                    return
+                
+                # Add cell to script group
+                if cell_index not in self.script_groups[self.current_script_group]["cells"]:
+                    self.script_groups[self.current_script_group]["cells"].append(cell_index)
+                    
+                # Add cell to main cells dictionary
+                self.cells[cell_index] = {
+                    "type": "script",
+                    "x": x,
+                    "y": y,
+                    "script_group": self.current_script_group
+                }
+                
+                # Draw the cell
+                self.draw_cell(x, y, "purple", cell_index)
             else:
                 # Handle other cell types
                 self.cells[cell_index] = {
@@ -358,7 +405,8 @@ class MapMaker:
                     "player_spawn": self.player_spawn,
                     "cells": self.cells,
                     "dialog_groups": self.dialog_groups,
-                    "startup_script": self.script_text.get("1.0", tk.END).strip()  # Save script
+                    "startup_script": self.script_text.get("1.0", tk.END).strip(),  # Save script
+                    "script_groups": self.script_groups
                 }
                 
                 # Create map directory if it doesn't exist
@@ -422,10 +470,12 @@ class MapMaker:
                 self.player_spawn = map_data["player_spawn"]
                 self.cells = map_data["cells"]
                 self.dialog_groups = map_data.get("dialog_groups", {})
+                self.script_groups = map_data.get("script_groups", {})
                 
                 self.draw_grid()
                 self.redraw_cells()
                 self.update_dialog_group_list()
+                self.update_script_group_list()
 
                 # Load script
                 if "startup_script" in map_data:
@@ -989,10 +1039,11 @@ playerCanMove();"""
 
     def generate_script_triggers(self):
         triggers = []
-        for index, cell in self.cells.items():
-            if cell["type"] == "script":
-                triggers.append(f'''                        if player_grid_index == {index}:
-                            self.execute_script("""{cell["script"]}""")''')
+        for group_name, group_data in self.script_groups.items():
+            if group_data["cells"]:
+                cells_str = str(group_data["cells"])
+                triggers.append(f'''                        if player_grid_index in {cells_str}:
+                            self.execute_script("""{group_data["script"]}""")''')
         return "\n".join(triggers)
 
     def parse_script_method(self):
@@ -1063,6 +1114,120 @@ playerCanMove();"""
                     self.cutscene_active = True
                 elif line == "playerCanMove()":
                     self.cutscene_active = False'''
+
+    def create_script_group(self):
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Create Script Group")
+        dialog.grab_set()
+
+        ttk.Label(dialog, text="Group Name:").pack(pady=5)
+        name_var = tk.StringVar()
+        ttk.Entry(dialog, textvariable=name_var).pack(pady=5)
+
+        def save():
+            name = name_var.get()
+            if name:
+                self.script_groups[name] = {
+                    "script": "",
+                    "cells": []
+                }
+                self.update_script_group_list()
+                dialog.destroy()
+
+        ttk.Button(dialog, text="Save", command=save).pack(pady=5)
+
+    def edit_script_group(self):
+        if not self.current_script_group:
+            tk.messagebox.showerror("Error", "Please select a script group first!")
+            return
+
+        dialog = tk.Toplevel(self.root)
+        dialog.title(f"Edit Script Group: {self.current_script_group}")
+        dialog.grab_set()
+
+        # Add rename and delete buttons
+        control_frame = ttk.Frame(dialog)
+        control_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(
+            control_frame,
+            text="Rename Group",
+            command=lambda: self.rename_script_group(dialog)
+        ).pack(side=tk.LEFT, padx=2)
+        
+        ttk.Button(
+            control_frame,
+            text="Delete Group",
+            command=lambda: self.delete_script_group(dialog)
+        ).pack(side=tk.LEFT, padx=2)
+
+        # Script editor
+        ttk.Label(dialog, text="Script:").pack(pady=5)
+        script_text = tk.Text(dialog, height=10, width=50)
+        script_text.pack(padx=5, pady=5)
+        script_text.insert("1.0", self.script_groups[self.current_script_group]["script"])
+
+        # Add help button
+        ttk.Button(
+            dialog,
+            text="Show Commands Help",
+            command=self.show_script_help
+        ).pack(fill=tk.X, pady=2, padx=5)
+
+        def save():
+            self.script_groups[self.current_script_group]["script"] = script_text.get("1.0", tk.END).strip()
+            dialog.destroy()
+
+        ttk.Button(dialog, text="Save", command=save).pack(pady=5)
+
+    def rename_script_group(self, parent_dialog):
+        dialog = tk.Toplevel(parent_dialog)
+        dialog.title("Rename Script Group")
+        dialog.grab_set()
+
+        ttk.Label(dialog, text="New Name:").pack(pady=5)
+        name_var = tk.StringVar(value=self.current_script_group)
+        ttk.Entry(dialog, textvariable=name_var).pack(pady=5)
+
+        def save():
+            new_name = name_var.get()
+            if new_name and new_name != self.current_script_group:
+                self.script_groups[new_name] = self.script_groups[self.current_script_group]
+                del self.script_groups[self.current_script_group]
+                self.current_script_group = new_name
+                self.update_script_group_list()
+                self.script_group_var.set(new_name)
+                dialog.destroy()
+                parent_dialog.destroy()
+                self.edit_script_group()
+
+        ttk.Button(dialog, text="Save", command=save).pack(pady=5)
+
+    def delete_script_group(self, parent_dialog):
+        if tk.messagebox.askyesno("Confirm Delete", f"Delete script group '{self.current_script_group}'?"):
+            # Remove all cells associated with this group
+            cells_to_remove = []
+            for index, cell in self.cells.items():
+                if cell.get("type") == "script" and cell.get("script_group") == self.current_script_group:
+                    cells_to_remove.append(index)
+            
+            for index in cells_to_remove:
+                del self.cells[index]
+                self.canvas.delete(f"cell_{index}")
+            
+            del self.script_groups[self.current_script_group]
+            self.current_script_group = None
+            self.script_group_var.set("")
+            self.update_script_group_list()
+            parent_dialog.destroy()
+
+    def update_script_group_list(self):
+        groups = list(self.script_groups.keys())
+        self.script_group_combo['values'] = groups
+
+    def on_script_group_selected(self, event):
+        self.current_script_group = self.script_group_var.get()
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = MapMaker(root)

@@ -214,7 +214,7 @@ class d1:
                             self.catCarpet.start_dialog()
                         if player_grid_index in [115, 116, 133, 149, 165] and not self.bed.is_active:
                             self.bed.start_dialog()
-                        if player_grid_index == 170:
+                        if player_grid_index in [170]:
                             self.execute_script("""wait(2); dialog("intro");""")
                         elif self.firstpaper.is_active:
                             if self.firstpaper.dialog_ended:
