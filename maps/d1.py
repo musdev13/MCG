@@ -70,17 +70,35 @@ class d1:
             self.screen.blit(self.bg_image, (0, 0))
             self.player.draw(self.screen)
             pygame.display.flip()
-            #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass
         self.intro.start_dialog()
+        while self.intro.is_active:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_z:
+                        self.intro.next()
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            if self.intro.is_active:
+                self.intro.draw()
+            pygame.display.flip()
         start_time = time.time()
         while time.time() - start_time < 2:
             self.screen.blit(self.bg_image, (0, 0))
             self.player.draw(self.screen)
             pygame.display.flip()
-            #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass
         self.intro1.start_dialog()
+        while self.intro1.is_active:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_z:
+                        self.intro1.next()
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            if self.intro1.is_active:
+                self.intro1.draw()
+            pygame.display.flip()
         self.cutscene_active = False
 
     def draw(self):

@@ -841,11 +841,10 @@ playerCanMove();"""
         if not script:
             return ""
             
-        # Split into lines and parse each command
         lines = script.split("\n")
         parsed_lines = []
         
-        # Add fade surface initialization
+        # Add fade surface initialization with proper indentation
         parsed_lines.append("        # Initialize fade surfaces")
         parsed_lines.append("        self.black_surface = pygame.Surface((800, 600))")
         parsed_lines.append("        self.black_surface.fill((0, 0, 0))")
@@ -853,7 +852,28 @@ playerCanMove();"""
         for line in lines:
             line = line.strip().rstrip(";")
             if line:
-                if line.startswith("fadeIn("):
+                if line.startswith("dialog("):
+                    group = line[7:-1].strip('"\'')
+                    parsed_lines.append(f"""        self.{group}.start_dialog()
+        while self.{group}.is_active:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_z:
+                        self.{group}.next()
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            if self.{group}.is_active:
+                self.{group}.draw()
+            pygame.display.flip()""")
+                elif line.startswith("wait("):
+                    seconds = line[5:-1]
+                    parsed_lines.append(f"""        start_time = time.time()
+        while time.time() - start_time < {seconds}:
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            pygame.display.flip()
+            for event in pygame.event.get(): pass""")
+                elif line.startswith("fadeIn("):
                     duration = line[7:-1]
                     parsed_lines.append(f"""        start_time = time.time()
         fade_duration = {duration}
@@ -898,7 +918,16 @@ playerCanMove();"""
             for event in pygame.event.get(): pass""")
                 elif line.startswith("dialog("):
                     group = line[7:-1].strip('"\'')
-                    parsed_lines.append(f"        self.{group}.start_dialog()")
+                    parsed_lines.append(f"""        self.{group}.start_dialog()
+        while self.{group}.is_active:
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            {self.generate_dialog_drawing()}
+            pygame.display.flip()
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_z:
+                        self.{group}.next()""")
                 elif line == "playerCantMove()":
                     parsed_lines.append(f"        self.cutscene_active = True")
                 elif line == "playerCanMove()":
