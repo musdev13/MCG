@@ -101,16 +101,14 @@ class d1:
                         if player_grid_index in [56, 57] and not self.second_papers.is_active:
                             self.second_papers.start_dialog()
                         elif self.firstpaper.is_active:
-                            # Check if this is the last dialog
-                            if self.firstpaper.current_dialog_index == len(self.firstpaper.dialogs) - 1:
+                            if self.firstpaper.current_index == len(self.firstpaper.dialog_data) - 1:
                                 self.firstpaper.next()
-                                self.firstpaper.current_dialog_index = 0  # Reset index
+                                self.firstpaper.current_index = 0  # Reset index
                             else:
                                 self.firstpaper.next()
                         elif self.second_papers.is_active:
-                            # Check if this is the last dialog
-                            if self.second_papers.current_dialog_index == len(self.second_papers.dialogs) - 1:
+                            if self.second_papers.current_index == len(self.second_papers.dialog_data) - 1:
                                 self.second_papers.next()
-                                self.second_papers.current_dialog_index = 0  # Reset index
+                                self.second_papers.current_index = 0  # Reset index
                             else:
                                 self.second_papers.next()
