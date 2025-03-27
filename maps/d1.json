@@ -321,19 +321,37 @@
             "x": 9,
             "y": 3,
             "dialog_group": "second_papers"
+        },
+        "35": {
+            "type": "dialog",
+            "x": 3,
+            "y": 2,
+            "dialog_group": "windows"
+        },
+        "36": {
+            "type": "dialog",
+            "x": 4,
+            "y": 2,
+            "dialog_group": "windows"
+        },
+        "37": {
+            "type": "dialog",
+            "x": 5,
+            "y": 2,
+            "dialog_group": "windows"
         }
     },
     "dialog_groups": {
         "firstpaper": {
             "dialogs": [
                 {
-                    "text": "First Dialog",
+                    "text": "It's just a piece of paper with my plans.",
                     "character": "D",
                     "expression": null,
                     "wait": true
                 },
                 {
-                    "text": "Nothing new",
+                    "text": "Why am I even focusing on this?",
                     "character": "D",
                     "expression": null,
                     "wait": true
@@ -355,7 +373,13 @@
         "second_papers": {
             "dialogs": [
                 {
-                    "text": "Second dialogs",
+                    "text": "These are just some of my drawings",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                },
+                {
+                    "text": "I don't see anything interesting in them",
                     "character": "D",
                     "expression": null,
                     "wait": true
@@ -366,30 +390,7 @@
                 57
             ]
         },
-        "intro": {
-            "dialogs": [
-                {
-                    "text": "Well, new day, new events!",
-                    "character": "D",
-                    "expression": null,
-                    "wait": true
-                },
-                {
-                    "text": "Hmm...",
-                    "character": "D",
-                    "expression": null,
-                    "wait": true
-                },
-                {
-                    "text": "first I need to figure out what to do.",
-                    "character": "D",
-                    "expression": null,
-                    "wait": true
-                }
-            ],
-            "cells": []
-        },
-        "intro1": {
+        "intro2": {
             "dialogs": [
                 {
                     "text": "Right!",
@@ -405,7 +406,62 @@
                 }
             ],
             "cells": []
+        },
+        "intro1": {
+            "dialogs": [
+                {
+                    "text": "Hmm...",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                },
+                {
+                    "text": "first I need to figure out what to do.",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                }
+            ],
+            "cells": []
+        },
+        "intro": {
+            "dialogs": [
+                {
+                    "text": "Well, new day, new events!",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                }
+            ],
+            "cells": []
+        },
+        "windows": {
+            "dialogs": [
+                {
+                    "text": "They're windows, like...",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                },
+                {
+                    "text": "They're not real. They're painted.",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                },
+                {
+                    "text": "Something like that.",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                }
+            ],
+            "cells": [
+                35,
+                36,
+                37
+            ]
         }
     },
-    "startup_script": "playerCantMove();\nfadeIn(3);\nwait(2);\ndialog(\"intro\");\nwait(2);\ndialog(\"intro1\");\nplayerCanMove();"
+    "startup_script": "playerCantMove();\nfadeIn(3);\nwait(2);\ndialog(\"intro\");\nwait(2);\ndialog(\"intro1\");\nwait(3);\ndialog(\"intro2\");\nplayerCanMove();"
 }

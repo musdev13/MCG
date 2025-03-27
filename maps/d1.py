@@ -40,10 +40,12 @@ class d1:
         self.collisionBlocks = [22, 25, 18, 50, 34, 66, 82, 114, 98, 130, 146, 162, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 46, 27, 28, 44, 45, 26, 62, 78, 110, 94, 126, 142, 158, 174, 38, 39, 41, 40, 21, 20, 19]
 
         # Initialize dialogs
-        self.firstpaper = Dialog(screen, [['First Dialog', 'D', 'None', 'False', 'True'], ['Nothing new', 'D', 'None', 'False', 'True']], self.player)
-        self.second_papers = Dialog(screen, [['Second dialogs', 'D', 'None', 'False', 'True']], self.player)
-        self.intro = Dialog(screen, [['Well, new day, new events!', 'D', 'None', 'False', 'True'], ['Hmm...', 'D', 'None', 'False', 'True'], ['first I need to figure out what to do.', 'D', 'None', 'False', 'True']], self.player)
-        self.intro1 = Dialog(screen, [['Right!', 'D', 'None', 'False', 'True'], ['I can go and socialize with someone, after all this time....', 'D', 'None', 'False', 'True']], self.player)
+        self.firstpaper = Dialog(screen, [["It's just a piece of paper with my plans.", 'D', 'None', 'False', 'True'], ['Why am I even focusing on this?', 'D', 'None', 'False', 'True']], self.player)
+        self.second_papers = Dialog(screen, [['These are just some of my drawings', 'D', 'None', 'False', 'True'], ["I don't see anything interesting in them", 'D', 'None', 'False', 'True']], self.player)
+        self.intro2 = Dialog(screen, [['Right!', 'D', 'None', 'False', 'True'], ['I can go and socialize with someone, after all this time....', 'D', 'None', 'False', 'True']], self.player)
+        self.intro1 = Dialog(screen, [['Hmm...', 'D', 'None', 'False', 'True'], ['first I need to figure out what to do.', 'D', 'None', 'False', 'True']], self.player)
+        self.intro = Dialog(screen, [['Well, new day, new events!', 'D', 'None', 'False', 'True']], self.player)
+        self.windows = Dialog(screen, [["They're windows, like...", 'D', 'None', 'False', 'True'], ["They're not real. They're painted.", 'D', 'None', 'False', 'True'], ['Something like that.', 'D', 'None', 'False', 'True']], self.player)
 
         # Run startup script
         # Initialize fade surfaces
@@ -99,6 +101,23 @@ class d1:
             if self.intro1.is_active:
                 self.intro1.draw()
             pygame.display.flip()
+        start_time = time.time()
+        while time.time() - start_time < 3:
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            pygame.display.flip()
+            for event in pygame.event.get(): pass
+        self.intro2.start_dialog()
+        while self.intro2.is_active:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_z:
+                        self.intro2.next()
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            if self.intro2.is_active:
+                self.intro2.draw()
+            pygame.display.flip()
         self.cutscene_active = False
 
     def draw(self):
@@ -114,6 +133,8 @@ class d1:
                             self.firstpaper.start_dialog()
                         if player_grid_index in [56, 57] and not self.second_papers.is_active:
                             self.second_papers.start_dialog()
+                        if player_grid_index in [35, 36, 37] and not self.windows.is_active:
+                            self.windows.start_dialog()
                         elif self.firstpaper.is_active:
                             if self.firstpaper.dialog_ended:
                                 self.firstpaper.current_index = 0
@@ -136,17 +157,17 @@ class d1:
                                 self.second_papers.is_text_complete = False
                             else:
                                 self.second_papers.next()
-                        elif self.intro.is_active:
-                            if self.intro.dialog_ended:
-                                self.intro.current_index = 0
-                                self.intro.dialog_ended = False
-                                self.intro.is_active = False
-                                self.intro.current_text = ""
-                                self.intro.display_text = ""
-                                self.intro.text_counter = 0
-                                self.intro.is_text_complete = False
+                        elif self.intro2.is_active:
+                            if self.intro2.dialog_ended:
+                                self.intro2.current_index = 0
+                                self.intro2.dialog_ended = False
+                                self.intro2.is_active = False
+                                self.intro2.current_text = ""
+                                self.intro2.display_text = ""
+                                self.intro2.text_counter = 0
+                                self.intro2.is_text_complete = False
                             else:
-                                self.intro.next()
+                                self.intro2.next()
                         elif self.intro1.is_active:
                             if self.intro1.dialog_ended:
                                 self.intro1.current_index = 0
@@ -158,6 +179,28 @@ class d1:
                                 self.intro1.is_text_complete = False
                             else:
                                 self.intro1.next()
+                        elif self.intro.is_active:
+                            if self.intro.dialog_ended:
+                                self.intro.current_index = 0
+                                self.intro.dialog_ended = False
+                                self.intro.is_active = False
+                                self.intro.current_text = ""
+                                self.intro.display_text = ""
+                                self.intro.text_counter = 0
+                                self.intro.is_text_complete = False
+                            else:
+                                self.intro.next()
+                        elif self.windows.is_active:
+                            if self.windows.dialog_ended:
+                                self.windows.current_index = 0
+                                self.windows.dialog_ended = False
+                                self.windows.is_active = False
+                                self.windows.current_text = ""
+                                self.windows.display_text = ""
+                                self.windows.text_counter = 0
+                                self.windows.is_text_complete = False
+                            else:
+                                self.windows.next()
 
             self.screen.blit(self.bg_image, (0, 0))
             
@@ -174,10 +217,14 @@ class d1:
                 self.firstpaper.draw()
             if self.second_papers.is_active:
                 self.second_papers.draw()
-            if self.intro.is_active:
-                self.intro.draw()
+            if self.intro2.is_active:
+                self.intro2.draw()
             if self.intro1.is_active:
                 self.intro1.draw()
+            if self.intro.is_active:
+                self.intro.draw()
+            if self.windows.is_active:
+                self.windows.draw()
 
             pygame.display.flip()
             #pygame.time.Clock().tick(60)
@@ -196,6 +243,8 @@ class d1:
         return any([
             hasattr(self, "firstpaper") and self.firstpaper.is_active or
             hasattr(self, "second_papers") and self.second_papers.is_active or
+            hasattr(self, "intro2") and self.intro2.is_active or
+            hasattr(self, "intro1") and self.intro1.is_active or
             hasattr(self, "intro") and self.intro.is_active or
-            hasattr(self, "intro1") and self.intro1.is_active
+            hasattr(self, "windows") and self.windows.is_active
         ])

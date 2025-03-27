@@ -19,7 +19,7 @@ class Dialog:
         # Text animation properties
         self.current_text = ""
         self.display_text = ""
-        self.text_speed = 0.5  # Characters per frame
+        self.text_speed = 1  # Characters per frame
         self.text_counter = 0
         self.is_text_complete = False
         self.pause_timer = 0
