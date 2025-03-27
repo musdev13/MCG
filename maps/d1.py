@@ -60,86 +60,20 @@ class d1:
             self.player.draw(self.screen)
             self.screen.blit(fade_surface, (0, 0))
             pygame.display.flip()
-            pygame.time.Clock().tick(60)
+            #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass
         start_time = time.time()
         while time.time() - start_time < 2:
             self.screen.blit(self.bg_image, (0, 0))
             self.player.draw(self.screen)
             pygame.display.flip()
-            pygame.time.Clock().tick(60)
+            #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass
         self.intro.start_dialog()
         self.cutscene_active = False
 
-    def handle_fade(self):
-        if self.is_fading:
-            current_time = pygame.time.get_ticks()
-            progress = (current_time - self.fade_start) / self.fade_duration
-            if progress >= 1:
-                self.is_fading = False
-            else:
-                alpha = int((1 - progress) * 255)
-                self.fade_screen.set_alpha(alpha)
-                self.screen.blit(self.fade_screen, (0, 0))
-
-    def check_collision(self, next_x, next_y):
-        feet_x = next_x + self.player.sprite_width // 2
-        feet_y = next_y + self.player.sprite_height
-        
-        grid_x = feet_x // self.grid_size
-        grid_y = feet_y // self.grid_size
-        
-        if 0 <= grid_x < 16 and 0 <= grid_y < 12:
-            index = grid_y * 16 + grid_x
-            if index in self.collisionBlocks:
-                return True
-        return False
-
-    def is_any_dialog_active(self):
-        return any([
-            hasattr(self, "firstpaper") and self.firstpaper.is_active or
-            hasattr(self, "second_papers") and self.second_papers.is_active or
-            hasattr(self, "intro") and self.intro.is_active
-        ])
-
-    def get_player_grid_index(self):
-        player_feet_x = self.player.x + self.player.sprite_width // 2
-        player_feet_y = self.player.y + self.player.sprite_height
-        
-        grid_x = player_feet_x // self.grid_size
-        grid_y = player_feet_y // self.grid_size
-        
-        index = grid_y * 16 + grid_x
-        return index if 0 <= grid_x < 16 and 0 <= grid_y < 12 else None
-
     def draw(self):
         while self.running:
-            self.screen.blit(self.bg_image, (0, 0))
-            
-            dG.draw(False, self.screen)
-            
-            self.player.is_moving = not (self.is_any_dialog_active() or self.cutscene_active)
-            
-            if not self.cutscene_active and not self.is_any_dialog_active():
-                self.player.move(self)
-            
-            self.player.draw(self.screen)
-
-            if self.firstpaper.is_active:
-                self.firstpaper.draw()
-            if self.second_papers.is_active:
-                self.second_papers.draw()
-            if self.intro.is_active:
-                self.intro.draw()
-
-            # Handle fade effect
-            self.handle_fade()
-
-            if Level.levelName == "d1":
-                pygame.display.flip()
-                pygame.time.Clock().tick(60)
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -184,3 +118,41 @@ class d1:
                                 self.intro.is_text_complete = False
                             else:
                                 self.intro.next()
+
+            self.screen.blit(self.bg_image, (0, 0))
+            
+            dG.draw(False, self.screen)
+            
+            self.player.is_moving = not (self.is_any_dialog_active() or self.cutscene_active)
+            
+            if not self.cutscene_active and not self.is_any_dialog_active():
+                self.player.move(self)
+            
+            self.player.draw(self.screen)
+
+            if self.firstpaper.is_active:
+                self.firstpaper.draw()
+            if self.second_papers.is_active:
+                self.second_papers.draw()
+            if self.intro.is_active:
+                self.intro.draw()
+
+            pygame.display.flip()
+            #pygame.time.Clock().tick(60)
+
+    def get_player_grid_index(self):
+        player_feet_x = self.player.x + self.player.sprite_width // 2
+        player_feet_y = self.player.y + self.player.sprite_height
+        
+        grid_x = player_feet_x // self.grid_size
+        grid_y = player_feet_y // self.grid_size
+        
+        index = grid_y * 16 + grid_x
+        return index if 0 <= grid_x < 16 and 0 <= grid_y < 12 else None
+
+    def is_any_dialog_active(self):
+        return any([
+            hasattr(self, "firstpaper") and self.firstpaper.is_active or
+            hasattr(self, "second_papers") and self.second_papers.is_active or
+            hasattr(self, "intro") and self.intro.is_active
+        ])

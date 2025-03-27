@@ -643,14 +643,12 @@ class MapMaker:
         self.current_dialog_group = self.dialog_group_var.get()
 
     def compile_to_py(self):
-        # Get map name from input field
-        self.map_name = self.map_name_var.get()
-        if not self.map_name:
+        map_name = self.map_name_var.get()
+        if not map_name:
             tk.messagebox.showerror("Error", "Please enter a map name first!")
             return
-
-        map_name = self.map_name  # Store map name in local variable
-        template = f'''# filepath: {{gamePath}}/maps/{self.map_name}.py
+            
+        template = f'''# filepath: {{gamePath}}/maps/{map_name}.py
 import pygame
 import time
 from settings import gamePath, Level
@@ -695,47 +693,18 @@ class {map_name}:
         # Run startup script
 {self.parse_script()}
 
-    def handle_fade(self):
-        if self.is_fading:
-            current_time = pygame.time.get_ticks()
-            progress = (current_time - self.fade_start) / self.fade_duration
-            if progress >= 1:
-                self.is_fading = False
-            else:
-                alpha = int((1 - progress) * 255)
-                self.fade_screen.set_alpha(alpha)
-                self.screen.blit(self.fade_screen, (0, 0))
-
-    def check_collision(self, next_x, next_y):
-        feet_x = next_x + self.player.sprite_width // 2
-        feet_y = next_y + self.player.sprite_height
-        
-        grid_x = feet_x // self.grid_size
-        grid_y = feet_y // self.grid_size
-        
-        if 0 <= grid_x < 16 and 0 <= grid_y < 12:
-            index = grid_y * 16 + grid_x
-            if index in self.collisionBlocks:
-                return True
-        return False
-
-    def is_any_dialog_active(self):
-        return any([
-            {self.generate_dialog_checks()}
-        ])
-
-    def get_player_grid_index(self):
-        player_feet_x = self.player.x + self.player.sprite_width // 2
-        player_feet_y = self.player.y + self.player.sprite_height
-        
-        grid_x = player_feet_x // self.grid_size
-        grid_y = player_feet_y // self.grid_size
-        
-        index = grid_y * 16 + grid_x
-        return index if 0 <= grid_x < 16 and 0 <= grid_y < 12 else None
-
     def draw(self):
         while self.running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    pygame.quit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_z:
+                        player_grid_index = self.get_player_grid_index()
+{self.generate_dialog_triggers()}
+{self.generate_dialog_next_checks()}
+
             self.screen.blit(self.bg_image, (0, 0))
             
             dG.draw(False, self.screen)
@@ -749,22 +718,23 @@ class {map_name}:
 
 {self.generate_dialog_drawing()}
 
-            # Handle fade effect
-            self.handle_fade()
+            pygame.display.flip()
+            #pygame.time.Clock().tick(60)
 
-            if Level.levelName == "{map_name}":
-                pygame.display.flip()
-                pygame.time.Clock().tick(60)
+    def get_player_grid_index(self):
+        player_feet_x = self.player.x + self.player.sprite_width // 2
+        player_feet_y = self.player.y + self.player.sprite_height
+        
+        grid_x = player_feet_x // self.grid_size
+        grid_y = player_feet_y // self.grid_size
+        
+        index = grid_y * 16 + grid_x
+        return index if 0 <= grid_x < 16 and 0 <= grid_y < 12 else None
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                    pygame.quit()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_z:
-                        player_grid_index = self.get_player_grid_index()
-{self.generate_dialog_triggers()}
-{self.generate_dialog_next_checks()}
+    def is_any_dialog_active(self):
+        return any([
+            {self.generate_dialog_checks()}
+        ])
 '''
         try:
             with open(f"../maps/{map_name}.py", "w", encoding='utf-8') as f:
@@ -889,7 +859,7 @@ playerCanMove();"""
             self.player.draw(self.screen)
             self.screen.blit(fade_surface, (0, 0))
             pygame.display.flip()
-            pygame.time.Clock().tick(60)
+            #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass""")
                 elif line.startswith("fadeOut("):
                     duration = line[8:-1]
@@ -906,7 +876,7 @@ playerCanMove();"""
             self.player.draw(self.screen)
             self.screen.blit(fade_surface, (0, 0))
             pygame.display.flip()
-            pygame.time.Clock().tick(60)
+            #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass""")
                 elif line.startswith("wait("):
                     seconds = line[5:-1]
@@ -915,7 +885,7 @@ playerCanMove();"""
             self.screen.blit(self.bg_image, (0, 0))
             self.player.draw(self.screen)
             pygame.display.flip()
-            pygame.time.Clock().tick(60)
+            #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass""")
                 elif line.startswith("dialog("):
                     group = line[7:-1].strip('"\'')

@@ -114,7 +114,7 @@ class dreamW:
 
         self.collisionBlocks = [
             16,17,1,21,22,80,96,
-            112,128,144,162,163,179,
+            112,128,162,163,179,
             178,183,184,185,186,191,
             175,143,142,126,79,
             63,47,30,13
@@ -321,7 +321,7 @@ class dreamW:
 
             if Level.levelName == "dreamW":
                 pygame.display.flip()
-                pygame.time.Clock().tick(120)
+                # pygame.time.Clock().tick(120)
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
