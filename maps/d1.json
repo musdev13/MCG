@@ -1,0 +1,312 @@
+{
+    "background": "bg.png",
+    "player_skin": "d",
+    "player_spawn": null,
+    "cells": {
+        "22": {
+            "type": "collision",
+            "x": 6,
+            "y": 1
+        },
+        "23": {
+            "type": "collision",
+            "x": 7,
+            "y": 1
+        },
+        "24": {
+            "type": "collision",
+            "x": 8,
+            "y": 1
+        },
+        "25": {
+            "type": "collision",
+            "x": 9,
+            "y": 1
+        },
+        "21": {
+            "type": "normal",
+            "x": 5,
+            "y": 1
+        },
+        "20": {
+            "type": "normal",
+            "x": 4,
+            "y": 1
+        },
+        "19": {
+            "type": "normal",
+            "x": 3,
+            "y": 1
+        },
+        "34": {
+            "type": "collision",
+            "x": 2,
+            "y": 2
+        },
+        "50": {
+            "type": "collision",
+            "x": 2,
+            "y": 3
+        },
+        "66": {
+            "type": "collision",
+            "x": 2,
+            "y": 4
+        },
+        "82": {
+            "type": "collision",
+            "x": 2,
+            "y": 5
+        },
+        "98": {
+            "type": "collision",
+            "x": 2,
+            "y": 6
+        },
+        "114": {
+            "type": "collision",
+            "x": 2,
+            "y": 7
+        },
+        "130": {
+            "type": "collision",
+            "x": 2,
+            "y": 8
+        },
+        "162": {
+            "type": "collision",
+            "x": 2,
+            "y": 10
+        },
+        "146": {
+            "type": "collision",
+            "x": 2,
+            "y": 9
+        },
+        "179": {
+            "type": "collision",
+            "x": 3,
+            "y": 11
+        },
+        "180": {
+            "type": "collision",
+            "x": 4,
+            "y": 11
+        },
+        "181": {
+            "type": "collision",
+            "x": 5,
+            "y": 11
+        },
+        "182": {
+            "type": "collision",
+            "x": 6,
+            "y": 11
+        },
+        "183": {
+            "type": "collision",
+            "x": 7,
+            "y": 11
+        },
+        "184": {
+            "type": "collision",
+            "x": 8,
+            "y": 11
+        },
+        "185": {
+            "type": "collision",
+            "x": 9,
+            "y": 11
+        },
+        "186": {
+            "type": "collision",
+            "x": 10,
+            "y": 11
+        },
+        "187": {
+            "type": "collision",
+            "x": 11,
+            "y": 11
+        },
+        "188": {
+            "type": "collision",
+            "x": 12,
+            "y": 11
+        },
+        "189": {
+            "type": "collision",
+            "x": 13,
+            "y": 11
+        },
+        "190": {
+            "type": "collision",
+            "x": 14,
+            "y": 11
+        },
+        "174": {
+            "type": "collision",
+            "x": 14,
+            "y": 10
+        },
+        "178": {
+            "type": "collision",
+            "x": 2,
+            "y": 11
+        },
+        "18": {
+            "type": "collision",
+            "x": 2,
+            "y": 1
+        },
+        "26": {
+            "type": "collision",
+            "x": 10,
+            "y": 1
+        },
+        "27": {
+            "type": "collision",
+            "x": 11,
+            "y": 1
+        },
+        "44": {
+            "type": "collision",
+            "x": 12,
+            "y": 2
+        },
+        "45": {
+            "type": "collision",
+            "x": 13,
+            "y": 2
+        },
+        "28": {
+            "type": "collision",
+            "x": 12,
+            "y": 1
+        },
+        "46": {
+            "type": "collision",
+            "x": 14,
+            "y": 2
+        },
+        "62": {
+            "type": "collision",
+            "x": 14,
+            "y": 3
+        },
+        "78": {
+            "type": "collision",
+            "x": 14,
+            "y": 4
+        },
+        "94": {
+            "type": "collision",
+            "x": 14,
+            "y": 5
+        },
+        "110": {
+            "type": "collision",
+            "x": 14,
+            "y": 6
+        },
+        "126": {
+            "type": "collision",
+            "x": 14,
+            "y": 7
+        },
+        "142": {
+            "type": "collision",
+            "x": 14,
+            "y": 8
+        },
+        "158": {
+            "type": "collision",
+            "x": 14,
+            "y": 9
+        },
+        "9": {
+            "type": "normal",
+            "x": 9,
+            "y": 0
+        },
+        "38": {
+            "type": "dialog",
+            "x": 6,
+            "y": 2
+        },
+        "39": {
+            "type": "dialog",
+            "x": 7,
+            "y": 2
+        },
+        "40": {
+            "type": "dialog",
+            "x": 8,
+            "y": 2
+        },
+        "41": {
+            "type": "dialog",
+            "x": 9,
+            "y": 2
+        },
+        "172": {
+            "type": "dialog",
+            "x": 12,
+            "y": 10
+        },
+        "173": {
+            "type": "dialog",
+            "x": 13,
+            "y": 10
+        },
+        "60": {
+            "type": "dialog",
+            "x": 12,
+            "y": 3
+        },
+        "61": {
+            "type": "dialog",
+            "x": 13,
+            "y": 3
+        },
+        "35": {
+            "type": "dialog",
+            "x": 3,
+            "y": 2
+        },
+        "36": {
+            "type": "dialog",
+            "x": 4,
+            "y": 2
+        },
+        "37": {
+            "type": "dialog",
+            "x": 5,
+            "y": 2
+        },
+        "2": {
+            "type": "collision",
+            "x": 2,
+            "y": 0
+        },
+        "3": {
+            "type": "collision",
+            "x": 3,
+            "y": 0
+        },
+        "4": {
+            "type": "collision",
+            "x": 4,
+            "y": 0
+        },
+        "5": {
+            "type": "collision",
+            "x": 5,
+            "y": 0
+        },
+        "6": {
+            "type": "collision",
+            "x": 6,
+            "y": 0
+        }
+    }
+}
