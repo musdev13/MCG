@@ -25,11 +25,13 @@ class d1:
                 row.append((x * self.grid_size, y * self.grid_size))
             self.grid.append(row)
 
-        # Initialize player
+        # Initialize player one cell above spawn point
         start_position = 58
+        spawn_y = start_position // 16 - 1  # Subtract 1 to move up one cell
+        spawn_x = start_position % 16
         self.player = Player(
-            self.grid[start_position // 16][start_position % 16][0],
-            self.grid[start_position // 16][start_position % 16][1],
+            self.grid[spawn_y][spawn_x][0],
+            self.grid[spawn_y][spawn_x][1],
             0,
             "d"
         )
