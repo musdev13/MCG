@@ -46,6 +46,9 @@ class d1:
         self.intro1 = Dialog(screen, [['Hmm...', 'D', 'None', 'False', 'True'], ['first I need to figure out what to do.', 'D', 'None', 'False', 'True']], self.player)
         self.intro = Dialog(screen, [['Well, new day, new events!', 'D', 'None', 'False', 'True']], self.player)
         self.windows = Dialog(screen, [["They're windows, like...", 'D', 'None', 'False', 'True'], ["They're not real. They're painted.", 'D', 'None', 'False', 'True'], ['Something like that.', 'D', 'None', 'False', 'True']], self.player)
+        self.sideTables = Dialog(screen, [["They're nightstands.", 'D', 'None', 'False', 'True'], ['I keep my things and neatly folded clothes in them.', 'D', 'None', 'False', 'True']], self.player)
+        self.inscriptions = Dialog(screen, [["There's some writing here", ' ', 'None', 'False', 'True'], ['Here are the names of your friends', ' ', 'None', 'False', 'True'], ["The first name is Marco. The second name is illegible, but it's probably Vlad", ' ', 'None', 'False', 'True']], self.player)
+        self.catCarpet = Dialog(screen, [["It's just a cute little cat-shaped rug.", ' ', 'None', 'False', 'True']], self.player)
 
         # Run startup script
         # Initialize fade surfaces
@@ -135,6 +138,12 @@ class d1:
                             self.second_papers.start_dialog()
                         if player_grid_index in [35, 36, 37] and not self.windows.is_active:
                             self.windows.start_dialog()
+                        if player_grid_index in [60, 61] and not self.sideTables.is_active:
+                            self.sideTables.start_dialog()
+                        if player_grid_index in [172, 173] and not self.inscriptions.is_active:
+                            self.inscriptions.start_dialog()
+                        if player_grid_index in [70, 86, 85, 101, 117, 118, 134, 135, 136, 137, 138, 139, 124, 108, 92, 75, 73, 74, 88, 87, 102, 103, 119, 120, 104, 89, 105, 90, 91, 107, 121, 106, 122, 123] and not self.catCarpet.is_active:
+                            self.catCarpet.start_dialog()
                         elif self.firstpaper.is_active:
                             if self.firstpaper.dialog_ended:
                                 self.firstpaper.current_index = 0
@@ -201,6 +210,39 @@ class d1:
                                 self.windows.is_text_complete = False
                             else:
                                 self.windows.next()
+                        elif self.sideTables.is_active:
+                            if self.sideTables.dialog_ended:
+                                self.sideTables.current_index = 0
+                                self.sideTables.dialog_ended = False
+                                self.sideTables.is_active = False
+                                self.sideTables.current_text = ""
+                                self.sideTables.display_text = ""
+                                self.sideTables.text_counter = 0
+                                self.sideTables.is_text_complete = False
+                            else:
+                                self.sideTables.next()
+                        elif self.inscriptions.is_active:
+                            if self.inscriptions.dialog_ended:
+                                self.inscriptions.current_index = 0
+                                self.inscriptions.dialog_ended = False
+                                self.inscriptions.is_active = False
+                                self.inscriptions.current_text = ""
+                                self.inscriptions.display_text = ""
+                                self.inscriptions.text_counter = 0
+                                self.inscriptions.is_text_complete = False
+                            else:
+                                self.inscriptions.next()
+                        elif self.catCarpet.is_active:
+                            if self.catCarpet.dialog_ended:
+                                self.catCarpet.current_index = 0
+                                self.catCarpet.dialog_ended = False
+                                self.catCarpet.is_active = False
+                                self.catCarpet.current_text = ""
+                                self.catCarpet.display_text = ""
+                                self.catCarpet.text_counter = 0
+                                self.catCarpet.is_text_complete = False
+                            else:
+                                self.catCarpet.next()
 
             self.screen.blit(self.bg_image, (0, 0))
             
@@ -225,6 +267,12 @@ class d1:
                 self.intro.draw()
             if self.windows.is_active:
                 self.windows.draw()
+            if self.sideTables.is_active:
+                self.sideTables.draw()
+            if self.inscriptions.is_active:
+                self.inscriptions.draw()
+            if self.catCarpet.is_active:
+                self.catCarpet.draw()
 
             pygame.display.flip()
             #pygame.time.Clock().tick(60)
@@ -246,5 +294,8 @@ class d1:
             hasattr(self, "intro2") and self.intro2.is_active or
             hasattr(self, "intro1") and self.intro1.is_active or
             hasattr(self, "intro") and self.intro.is_active or
-            hasattr(self, "windows") and self.windows.is_active
+            hasattr(self, "windows") and self.windows.is_active or
+            hasattr(self, "sideTables") and self.sideTables.is_active or
+            hasattr(self, "inscriptions") and self.inscriptions.is_active or
+            hasattr(self, "catCarpet") and self.catCarpet.is_active
         ])

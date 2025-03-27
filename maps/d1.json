@@ -339,6 +339,234 @@
             "x": 5,
             "y": 2,
             "dialog_group": "windows"
+        },
+        "60": {
+            "type": "dialog",
+            "x": 12,
+            "y": 3,
+            "dialog_group": "sideTables"
+        },
+        "61": {
+            "type": "dialog",
+            "x": 13,
+            "y": 3,
+            "dialog_group": "sideTables"
+        },
+        "172": {
+            "type": "dialog",
+            "x": 12,
+            "y": 10,
+            "dialog_group": "inscriptions"
+        },
+        "173": {
+            "type": "dialog",
+            "x": 13,
+            "y": 10,
+            "dialog_group": "inscriptions"
+        },
+        "70": {
+            "type": "dialog",
+            "x": 6,
+            "y": 4,
+            "dialog_group": "catCarpet"
+        },
+        "86": {
+            "type": "dialog",
+            "x": 6,
+            "y": 5,
+            "dialog_group": "catCarpet"
+        },
+        "85": {
+            "type": "dialog",
+            "x": 5,
+            "y": 5,
+            "dialog_group": "catCarpet"
+        },
+        "101": {
+            "type": "dialog",
+            "x": 5,
+            "y": 6,
+            "dialog_group": "catCarpet"
+        },
+        "117": {
+            "type": "dialog",
+            "x": 5,
+            "y": 7,
+            "dialog_group": "catCarpet"
+        },
+        "118": {
+            "type": "dialog",
+            "x": 6,
+            "y": 7,
+            "dialog_group": "catCarpet"
+        },
+        "134": {
+            "type": "dialog",
+            "x": 6,
+            "y": 8,
+            "dialog_group": "catCarpet"
+        },
+        "135": {
+            "type": "dialog",
+            "x": 7,
+            "y": 8,
+            "dialog_group": "catCarpet"
+        },
+        "136": {
+            "type": "dialog",
+            "x": 8,
+            "y": 8,
+            "dialog_group": "catCarpet"
+        },
+        "137": {
+            "type": "dialog",
+            "x": 9,
+            "y": 8,
+            "dialog_group": "catCarpet"
+        },
+        "138": {
+            "type": "dialog",
+            "x": 10,
+            "y": 8,
+            "dialog_group": "catCarpet"
+        },
+        "139": {
+            "type": "dialog",
+            "x": 11,
+            "y": 8,
+            "dialog_group": "catCarpet"
+        },
+        "124": {
+            "type": "dialog",
+            "x": 12,
+            "y": 7,
+            "dialog_group": "catCarpet"
+        },
+        "108": {
+            "type": "dialog",
+            "x": 12,
+            "y": 6,
+            "dialog_group": "catCarpet"
+        },
+        "92": {
+            "type": "dialog",
+            "x": 12,
+            "y": 5,
+            "dialog_group": "catCarpet"
+        },
+        "75": {
+            "type": "dialog",
+            "x": 11,
+            "y": 4,
+            "dialog_group": "catCarpet"
+        },
+        "73": {
+            "type": "dialog",
+            "x": 9,
+            "y": 4,
+            "dialog_group": "catCarpet"
+        },
+        "74": {
+            "type": "dialog",
+            "x": 10,
+            "y": 4,
+            "dialog_group": "catCarpet"
+        },
+        "88": {
+            "type": "dialog",
+            "x": 8,
+            "y": 5,
+            "dialog_group": "catCarpet"
+        },
+        "87": {
+            "type": "dialog",
+            "x": 7,
+            "y": 5,
+            "dialog_group": "catCarpet"
+        },
+        "102": {
+            "type": "dialog",
+            "x": 6,
+            "y": 6,
+            "dialog_group": "catCarpet"
+        },
+        "103": {
+            "type": "dialog",
+            "x": 7,
+            "y": 6,
+            "dialog_group": "catCarpet"
+        },
+        "119": {
+            "type": "dialog",
+            "x": 7,
+            "y": 7,
+            "dialog_group": "catCarpet"
+        },
+        "120": {
+            "type": "dialog",
+            "x": 8,
+            "y": 7,
+            "dialog_group": "catCarpet"
+        },
+        "104": {
+            "type": "dialog",
+            "x": 8,
+            "y": 6,
+            "dialog_group": "catCarpet"
+        },
+        "89": {
+            "type": "dialog",
+            "x": 9,
+            "y": 5,
+            "dialog_group": "catCarpet"
+        },
+        "105": {
+            "type": "dialog",
+            "x": 9,
+            "y": 6,
+            "dialog_group": "catCarpet"
+        },
+        "90": {
+            "type": "dialog",
+            "x": 10,
+            "y": 5,
+            "dialog_group": "catCarpet"
+        },
+        "91": {
+            "type": "dialog",
+            "x": 11,
+            "y": 5,
+            "dialog_group": "catCarpet"
+        },
+        "107": {
+            "type": "dialog",
+            "x": 11,
+            "y": 6,
+            "dialog_group": "catCarpet"
+        },
+        "121": {
+            "type": "dialog",
+            "x": 9,
+            "y": 7,
+            "dialog_group": "catCarpet"
+        },
+        "106": {
+            "type": "dialog",
+            "x": 10,
+            "y": 6,
+            "dialog_group": "catCarpet"
+        },
+        "122": {
+            "type": "dialog",
+            "x": 10,
+            "y": 7,
+            "dialog_group": "catCarpet"
+        },
+        "123": {
+            "type": "dialog",
+            "x": 11,
+            "y": 7,
+            "dialog_group": "catCarpet"
         }
     },
     "dialog_groups": {
@@ -460,6 +688,98 @@
                 35,
                 36,
                 37
+            ]
+        },
+        "sideTables": {
+            "dialogs": [
+                {
+                    "text": "They're nightstands.",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                },
+                {
+                    "text": "I keep my things and neatly folded clothes in them.",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                }
+            ],
+            "cells": [
+                60,
+                61
+            ]
+        },
+        "inscriptions": {
+            "dialogs": [
+                {
+                    "text": "There's some writing here",
+                    "character": " ",
+                    "expression": null,
+                    "wait": true
+                },
+                {
+                    "text": "Here are the names of your friends",
+                    "character": " ",
+                    "expression": null,
+                    "wait": true
+                },
+                {
+                    "text": "The first name is Marco. The second name is illegible, but it's probably Vlad",
+                    "character": " ",
+                    "expression": null,
+                    "wait": true
+                }
+            ],
+            "cells": [
+                172,
+                173
+            ]
+        },
+        "catCarpet": {
+            "dialogs": [
+                {
+                    "text": "It's just a cute little cat-shaped rug.",
+                    "character": " ",
+                    "expression": null,
+                    "wait": true
+                }
+            ],
+            "cells": [
+                70,
+                86,
+                85,
+                101,
+                117,
+                118,
+                134,
+                135,
+                136,
+                137,
+                138,
+                139,
+                124,
+                108,
+                92,
+                75,
+                73,
+                74,
+                88,
+                87,
+                102,
+                103,
+                119,
+                120,
+                104,
+                89,
+                105,
+                90,
+                91,
+                107,
+                121,
+                106,
+                122,
+                123
             ]
         }
     },
