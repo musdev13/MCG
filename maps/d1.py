@@ -1,5 +1,6 @@
 # filepath: {gamePath}/maps/d1.py
 import pygame
+import time
 from settings import gamePath, Level
 from debugGrid import debugGrid as dG
 from Player import Player
@@ -12,6 +13,8 @@ class d1:
         self.grid_size = 48
         self.grid = []
         self.cutscene_active = False
+        self.is_fading = False
+        self.fade_screen = None
 
         self.bg_image = pygame.image.load(f"{gamePath}/img/d1/bg.png")
 
@@ -37,6 +40,48 @@ class d1:
         # Initialize dialogs
         self.firstpaper = Dialog(screen, [['First Dialog', 'D', 'None', 'False', 'True'], ['Nothing new', 'D', 'None', 'False', 'True']], self.player)
         self.second_papers = Dialog(screen, [['Second dialogs', 'D', 'None', 'False', 'True']], self.player)
+        self.intro = Dialog(screen, [['Text1', 'D', 'None', 'False', 'True'], ['Text2', 'D', 'None', 'False', 'True']], self.player)
+
+        # Run startup script
+        # Initialize fade surfaces
+        self.black_surface = pygame.Surface((800, 600))
+        self.black_surface.fill((0, 0, 0))
+        self.cutscene_active = True
+        start_time = time.time()
+        fade_duration = 3
+        while True:
+            current_time = time.time() - start_time
+            if current_time >= fade_duration:
+                break
+            fade_alpha = max(0, 255 * (1 - current_time / fade_duration))
+            fade_surface = self.black_surface.copy()
+            fade_surface.set_alpha(int(fade_alpha))
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            self.screen.blit(fade_surface, (0, 0))
+            pygame.display.flip()
+            pygame.time.Clock().tick(60)
+            for event in pygame.event.get(): pass
+        start_time = time.time()
+        while time.time() - start_time < 2:
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            pygame.display.flip()
+            pygame.time.Clock().tick(60)
+            for event in pygame.event.get(): pass
+        self.intro.start_dialog()
+        self.cutscene_active = False
+
+    def handle_fade(self):
+        if self.is_fading:
+            current_time = pygame.time.get_ticks()
+            progress = (current_time - self.fade_start) / self.fade_duration
+            if progress >= 1:
+                self.is_fading = False
+            else:
+                alpha = int((1 - progress) * 255)
+                self.fade_screen.set_alpha(alpha)
+                self.screen.blit(self.fade_screen, (0, 0))
 
     def check_collision(self, next_x, next_y):
         feet_x = next_x + self.player.sprite_width // 2
@@ -54,7 +99,8 @@ class d1:
     def is_any_dialog_active(self):
         return any([
             hasattr(self, "firstpaper") and self.firstpaper.is_active or
-            hasattr(self, "second_papers") and self.second_papers.is_active
+            hasattr(self, "second_papers") and self.second_papers.is_active or
+            hasattr(self, "intro") and self.intro.is_active
         ])
 
     def get_player_grid_index(self):
@@ -84,10 +130,15 @@ class d1:
                 self.firstpaper.draw()
             if self.second_papers.is_active:
                 self.second_papers.draw()
+            if self.intro.is_active:
+                self.intro.draw()
+
+            # Handle fade effect
+            self.handle_fade()
 
             if Level.levelName == "d1":
                 pygame.display.flip()
-                #pygame.time.Clock().tick(120)
+                pygame.time.Clock().tick(60)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -122,3 +173,14 @@ class d1:
                                 self.second_papers.is_text_complete = False
                             else:
                                 self.second_papers.next()
+                        elif self.intro.is_active:
+                            if self.intro.dialog_ended:
+                                self.intro.current_index = 0
+                                self.intro.dialog_ended = False
+                                self.intro.is_active = False
+                                self.intro.current_text = ""
+                                self.intro.display_text = ""
+                                self.intro.text_counter = 0
+                                self.intro.is_text_complete = False
+                            else:
+                                self.intro.next()

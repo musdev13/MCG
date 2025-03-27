@@ -144,6 +144,21 @@ class MapMaker:
             text="Edit Dialog Group",
             command=self.edit_dialog_group
         ).pack(fill=tk.X, pady=2)
+
+        # Add startup script frame
+        script_frame = ttk.LabelFrame(self.tools_frame, text="Startup Script")
+        script_frame.pack(fill=tk.X, pady=5, padx=2)
+
+        # Script text area
+        self.script_text = tk.Text(script_frame, height=6, width=30)
+        self.script_text.pack(fill=tk.X, pady=2)
+
+        # Add script commands help button
+        ttk.Button(
+            script_frame,
+            text="Show Commands Help",
+            command=self.show_script_help
+        ).pack(fill=tk.X, pady=2)
         
     def draw_grid(self):
         self.canvas.delete("grid")
@@ -628,13 +643,16 @@ class MapMaker:
         self.current_dialog_group = self.dialog_group_var.get()
 
     def compile_to_py(self):
-        if not self.map_name_var.get():
+        # Get map name from input field
+        self.map_name = self.map_name_var.get()
+        if not self.map_name:
             tk.messagebox.showerror("Error", "Please enter a map name first!")
             return
-            
-        map_name = self.map_name_var.get()
-        template = f'''# filepath: {{gamePath}}/maps/{map_name}.py
+
+        map_name = self.map_name  # Store map name in local variable
+        template = f'''# filepath: {{gamePath}}/maps/{self.map_name}.py
 import pygame
+import time
 from settings import gamePath, Level
 from debugGrid import debugGrid as dG
 from Player import Player
@@ -647,6 +665,8 @@ class {map_name}:
         self.grid_size = 48
         self.grid = []
         self.cutscene_active = False
+        self.is_fading = False
+        self.fade_screen = None
 
         self.bg_image = pygame.image.load(f"{{gamePath}}/img/{map_name}/bg.png")
 
@@ -671,6 +691,20 @@ class {map_name}:
 
         # Initialize dialogs
 {self.generate_dialog_initialization()}
+
+        # Run startup script
+{self.parse_script()}
+
+    def handle_fade(self):
+        if self.is_fading:
+            current_time = pygame.time.get_ticks()
+            progress = (current_time - self.fade_start) / self.fade_duration
+            if progress >= 1:
+                self.is_fading = False
+            else:
+                alpha = int((1 - progress) * 255)
+                self.fade_screen.set_alpha(alpha)
+                self.screen.blit(self.fade_screen, (0, 0))
 
     def check_collision(self, next_x, next_y):
         feet_x = next_x + self.player.sprite_width // 2
@@ -715,9 +749,12 @@ class {map_name}:
 
 {self.generate_dialog_drawing()}
 
+            # Handle fade effect
+            self.handle_fade()
+
             if Level.levelName == "{map_name}":
                 pygame.display.flip()
-                #pygame.time.Clock().tick(120)
+                pygame.time.Clock().tick(60)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -792,6 +829,103 @@ class {map_name}:
         for group_name in self.dialog_groups.keys():
             checks.append(f'hasattr(self, "{group_name}") and self.{group_name}.is_active')
         return " or\n            ".join(checks) if checks else "False"
+
+    def show_script_help(self):
+        help_text = """Available Commands:
+        
+fadeIn(duration) - Fade in from black screen
+fadeOut(duration) - Fade out to black screen
+wait(seconds) - Wait specified seconds
+dialog(groupName) - Start dialog from group
+playerCantMove() - Disable player movement
+playerCanMove() - Enable player movement
+
+Example:
+playerCantMove();
+fadeIn(3);
+wait(2);
+dialog("intro");
+playerCanMove();"""
+
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Script Commands Help")
+        dialog.grab_set()
+        
+        text = tk.Text(dialog, height=12, width=50)
+        text.pack(padx=5, pady=5)
+        text.insert("1.0", help_text)
+        text.config(state="disabled")
+
+    def parse_script(self):
+        """Parse script into executable Python code"""
+        script = self.script_text.get("1.0", tk.END).strip()
+        if not script:
+            return ""
+            
+        # Split into lines and parse each command
+        lines = script.split("\n")
+        parsed_lines = []
+        
+        # Add fade surface initialization
+        parsed_lines.append("        # Initialize fade surfaces")
+        parsed_lines.append("        self.black_surface = pygame.Surface((800, 600))")
+        parsed_lines.append("        self.black_surface.fill((0, 0, 0))")
+        
+        for line in lines:
+            line = line.strip().rstrip(";")
+            if line:
+                if line.startswith("fadeIn("):
+                    duration = line[7:-1]
+                    parsed_lines.append(f"""        start_time = time.time()
+        fade_duration = {duration}
+        while True:
+            current_time = time.time() - start_time
+            if current_time >= fade_duration:
+                break
+            fade_alpha = max(0, 255 * (1 - current_time / fade_duration))
+            fade_surface = self.black_surface.copy()
+            fade_surface.set_alpha(int(fade_alpha))
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            self.screen.blit(fade_surface, (0, 0))
+            pygame.display.flip()
+            pygame.time.Clock().tick(60)
+            for event in pygame.event.get(): pass""")
+                elif line.startswith("fadeOut("):
+                    duration = line[8:-1]
+                    parsed_lines.append(f"""        start_time = time.time()
+        fade_duration = {duration}
+        while True:
+            current_time = time.time() - start_time
+            if current_time >= fade_duration:
+                break
+            fade_alpha = min(255, 255 * (current_time / fade_duration))
+            fade_surface = self.black_surface.copy()
+            fade_surface.set_alpha(int(fade_alpha))
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            self.screen.blit(fade_surface, (0, 0))
+            pygame.display.flip()
+            pygame.time.Clock().tick(60)
+            for event in pygame.event.get(): pass""")
+                elif line.startswith("wait("):
+                    seconds = line[5:-1]
+                    parsed_lines.append(f"""        start_time = time.time()
+        while time.time() - start_time < {seconds}:
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            pygame.display.flip()
+            pygame.time.Clock().tick(60)
+            for event in pygame.event.get(): pass""")
+                elif line.startswith("dialog("):
+                    group = line[7:-1].strip('"\'')
+                    parsed_lines.append(f"        self.{group}.start_dialog()")
+                elif line == "playerCantMove()":
+                    parsed_lines.append(f"        self.cutscene_active = True")
+                elif line == "playerCanMove()":
+                    parsed_lines.append(f"        self.cutscene_active = False")
+        
+        return "\n".join(parsed_lines)
 
 if __name__ == "__main__":
     root = tk.Tk()

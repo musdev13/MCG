@@ -314,18 +314,6 @@
             "type": "dialog",
             "x": 8,
             "y": 3,
-            "dialog_group": "second papers"
-        },
-        "57": {
-            "type": "dialog",
-            "x": 9,
-            "y": 3,
-            "dialog_group": "second papers"
-        },
-        "56": {
-            "type": "dialog",
-            "x": 8,
-            "y": 3,
             "dialog_group": "second_papers"
         },
         "57": {
@@ -377,6 +365,23 @@
                 56,
                 57
             ]
+        },
+        "intro": {
+            "dialogs": [
+                {
+                    "text": "Text1",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                },
+                {
+                    "text": "Text2",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                }
+            ],
+            "cells": []
         }
     }
 }
