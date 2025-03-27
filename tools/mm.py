@@ -95,6 +95,13 @@ class MapMaker:
             command=self.load_map
         ).pack(fill=tk.X, pady=2)
         
+        # Add compile button after save/load buttons
+        ttk.Button(
+            self.tools_frame,
+            text="Compile to .py",
+            command=self.compile_to_py
+        ).pack(fill=tk.X, pady=2)
+        
         # Bind canvas events
         self.canvas.bind("<Button-1>", self.on_canvas_click)
         self.canvas.bind("<Motion>", self.on_canvas_move)
@@ -531,6 +538,162 @@ class MapMaker:
 
     def on_dialog_group_selected(self, event):
         self.current_dialog_group = self.dialog_group_var.get()
+
+    def compile_to_py(self):
+        if not self.map_name_var.get():
+            tk.messagebox.showerror("Error", "Please enter a map name first!")
+            return
+            
+        map_name = self.map_name_var.get()
+        template = f'''# filepath: {{gamePath}}/maps/{map_name}.py
+import pygame
+from settings import gamePath, Level
+from debugGrid import debugGrid as dG
+from Player import Player
+from dialog import Dialog
+
+class {map_name}:
+    def __init__(self, screen, gamePath=gamePath):
+        self.screen = screen
+        self.running = True
+        self.grid_size = 48
+        self.grid = []
+        self.cutscene_active = False
+
+        self.bg_image = pygame.image.load(f"{{gamePath}}/img/{map_name}/bg.png")
+
+        # Create grid
+        for y in range(12):
+            row = []
+            for x in range(16):
+                row.append((x * self.grid_size, y * self.grid_size))
+            self.grid.append(row)
+
+        # Initialize player
+        start_position = {self.player_spawn}
+        self.player = Player(
+            self.grid[start_position // 16][start_position % 16][0],
+            self.grid[start_position // 16][start_position % 16][1],
+            0,
+            "{self.skin_var.get()}"
+        )
+
+        # Add collision blocks
+        self.collisionBlocks = {self.get_collision_blocks()}
+
+        # Initialize dialogs
+{self.generate_dialog_initialization()}
+
+    def check_collision(self, next_x, next_y):
+        feet_x = next_x + self.player.sprite_width // 2
+        feet_y = next_y + self.player.sprite_height
+        
+        grid_x = feet_x // self.grid_size
+        grid_y = feet_y // self.grid_size
+        
+        if 0 <= grid_x < 16 and 0 <= grid_y < 12:
+            index = grid_y * 16 + grid_x
+            if index in self.collisionBlocks:
+                return True
+        return False
+
+    def is_any_dialog_active(self):
+        return any([
+            {self.generate_dialog_checks()}
+        ])
+
+    def get_player_grid_index(self):
+        player_feet_x = self.player.x + self.player.sprite_width // 2
+        player_feet_y = self.player.y + self.player.sprite_height
+        
+        grid_x = player_feet_x // self.grid_size
+        grid_y = player_feet_y // self.grid_size
+        
+        index = grid_y * 16 + grid_x
+        return index if 0 <= grid_x < 16 and 0 <= grid_y < 12 else None
+
+    def draw(self):
+        while self.running:
+            self.screen.blit(self.bg_image, (0, 0))
+            
+            dG.draw(False, self.screen)
+            
+            self.player.is_moving = not (self.is_any_dialog_active() or self.cutscene_active)
+            
+            if not self.cutscene_active and not self.is_any_dialog_active():
+                self.player.move(self)
+            
+            self.player.draw(self.screen)
+
+{self.generate_dialog_drawing()}
+
+            if Level.levelName == "{map_name}":
+                pygame.display.flip()
+                pygame.time.Clock().tick(120)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    pygame.quit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_z:
+                        player_grid_index = self.get_player_grid_index()
+{self.generate_dialog_triggers()}
+{self.generate_dialog_next_checks()}
+'''
+        try:
+            with open(f"../maps/{map_name}.py", "w", encoding='utf-8') as f:
+                f.write(template)
+            tk.messagebox.showinfo("Success", f"Map compiled to {map_name}.py")
+        except Exception as e:
+            tk.messagebox.showerror("Error", f"Failed to compile map: {str(e)}")
+
+    def get_collision_blocks(self):
+        collision_cells = [str(index) for index, cell in self.cells.items() 
+                          if cell["type"] == "collision"]
+        return f"[{', '.join(collision_cells)}]"
+
+    def generate_dialog_initialization(self):
+        init_code = []
+        for group_name, group_data in self.dialog_groups.items():
+            dialog_data = []
+            for dialog in group_data["dialogs"]:
+                dialog_data.append([
+                    dialog["text"],
+                    dialog["character"] if dialog["character"] else "None",
+                    "None",  # expression
+                    "False",  # show_avatar
+                    "True" if dialog["character"] else "False"  # show_name
+                ])
+            init_code.append(f'        self.{group_name} = Dialog(screen, {dialog_data}, self.player)')
+        return "\n".join(init_code)
+
+    def generate_dialog_drawing(self):
+        draw_code = []
+        for group_name in self.dialog_groups.keys():
+            draw_code.append(f'            if self.{group_name}.is_active:\n                self.{group_name}.draw()')
+        return "\n".join(draw_code)
+
+    def generate_dialog_triggers(self):
+        triggers = []
+        for group_name, group_data in self.dialog_groups.items():
+            if group_data["cells"]:
+                cells_str = str(group_data["cells"])
+                triggers.append(f'                        if player_grid_index in {cells_str} and not self.{group_name}.is_active:\n                            self.{group_name}.start_dialog()')
+        return "\n".join(triggers)
+
+    def generate_dialog_next_checks(self):
+        next_checks = []
+        for group_name in self.dialog_groups.keys():
+            next_checks.append(f'                        elif self.{group_name}.is_active:\n                            self.{group_name}.next()')
+        return "\n".join(next_checks)
+
+    def generate_dialog_checks(self):
+        """Generate code to check if any dialog is active"""
+        checks = []
+        for group_name in self.dialog_groups.keys():
+            checks.append(f'hasattr(self, "{group_name}") and self.{group_name}.is_active')
+        return " or\n            ".join(checks) if checks else "False"
 
 if __name__ == "__main__":
     root = tk.Tk()

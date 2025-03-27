@@ -274,16 +274,180 @@
             "x": 7,
             "y": 2,
             "dialog_group": "firstpaper"
+        },
+        "2": {
+            "type": "normal",
+            "x": 2,
+            "y": 0
+        },
+        "3": {
+            "type": "normal",
+            "x": 3,
+            "y": 0
+        },
+        "4": {
+            "type": "normal",
+            "x": 4,
+            "y": 0
+        },
+        "5": {
+            "type": "normal",
+            "x": 5,
+            "y": 0
+        },
+        "6": {
+            "type": "normal",
+            "x": 6,
+            "y": 0
+        },
+        "9": {
+            "type": "normal",
+            "x": 9,
+            "y": 0
+        },
+        "10": {
+            "type": "normal",
+            "x": 10,
+            "y": 0
+        },
+        "11": {
+            "type": "normal",
+            "x": 11,
+            "y": 0
+        },
+        "12": {
+            "type": "normal",
+            "x": 12,
+            "y": 0
+        },
+        "28": {
+            "type": "collision",
+            "x": 12,
+            "y": 1
+        },
+        "29": {
+            "type": "normal",
+            "x": 13,
+            "y": 1
+        },
+        "30": {
+            "type": "normal",
+            "x": 14,
+            "y": 1
+        },
+        "38": {
+            "type": "collision",
+            "x": 6,
+            "y": 2
+        },
+        "39": {
+            "type": "collision",
+            "x": 7,
+            "y": 2
+        },
+        "22": {
+            "type": "collision",
+            "x": 6,
+            "y": 1
+        },
+        "23": {
+            "type": "normal",
+            "x": 7,
+            "y": 1
+        },
+        "24": {
+            "type": "normal",
+            "x": 8,
+            "y": 1
+        },
+        "25": {
+            "type": "collision",
+            "x": 9,
+            "y": 1
+        },
+        "45": {
+            "type": "collision",
+            "x": 13,
+            "y": 2
+        },
+        "44": {
+            "type": "collision",
+            "x": 12,
+            "y": 2
+        },
+        "27": {
+            "type": "collision",
+            "x": 11,
+            "y": 1
+        },
+        "26": {
+            "type": "collision",
+            "x": 10,
+            "y": 1
+        },
+        "41": {
+            "type": "collision",
+            "x": 9,
+            "y": 2
+        },
+        "40": {
+            "type": "collision",
+            "x": 8,
+            "y": 2
+        },
+        "21": {
+            "type": "collision",
+            "x": 5,
+            "y": 1
+        },
+        "20": {
+            "type": "collision",
+            "x": 4,
+            "y": 1
+        },
+        "19": {
+            "type": "collision",
+            "x": 3,
+            "y": 1
+        },
+        "54": {
+            "type": "dialog",
+            "x": 6,
+            "y": 3,
+            "dialog_group": "firstpaper"
+        },
+        "55": {
+            "type": "dialog",
+            "x": 7,
+            "y": 3,
+            "dialog_group": "firstpaper"
+        },
+        "56": {
+            "type": "dialog",
+            "x": 8,
+            "y": 3,
+            "dialog_group": "second papers"
+        },
+        "57": {
+            "type": "dialog",
+            "x": 9,
+            "y": 3,
+            "dialog_group": "second papers"
         }
     },
     "dialog_groups": {
         "firstpaper": {
             "dialogs": [
                 {
-                    "text": "Test",
+                    "text": "First Dialog",
                     "character": "D",
                     "expression": null,
-                    "choices": false,
+                    "wait": true
+                },
+                {
+                    "text": "Nothing new",
+                    "character": "D",
+                    "expression": null,
                     "wait": true
                 }
             ],
@@ -296,7 +460,22 @@
                 55,
                 38,
                 38,
-                38
+                38,
+                54
+            ]
+        },
+        "second papers": {
+            "dialogs": [
+                {
+                    "text": "Second dialogs",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                }
+            ],
+            "cells": [
+                56,
+                57
             ]
         }
     }
