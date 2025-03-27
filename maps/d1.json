@@ -1,7 +1,7 @@
 {
     "background": "bg.png",
-    "player_skin": "d",
-    "player_spawn": null,
+    "player_skin": "marko",
+    "player_spawn": 58,
     "cells": {
         "22": {
             "type": "collision",
@@ -23,30 +23,45 @@
             "x": 9,
             "y": 1
         },
-        "21": {
-            "type": "normal",
+        "6": {
+            "type": "collision",
+            "x": 6,
+            "y": 0
+        },
+        "5": {
+            "type": "collision",
             "x": 5,
-            "y": 1
+            "y": 0
         },
-        "20": {
-            "type": "normal",
+        "4": {
+            "type": "collision",
             "x": 4,
-            "y": 1
+            "y": 0
         },
-        "19": {
-            "type": "normal",
+        "3": {
+            "type": "collision",
             "x": 3,
-            "y": 1
+            "y": 0
         },
-        "34": {
+        "2": {
             "type": "collision",
             "x": 2,
-            "y": 2
+            "y": 0
+        },
+        "18": {
+            "type": "collision",
+            "x": 2,
+            "y": 1
         },
         "50": {
             "type": "collision",
             "x": 2,
             "y": 3
+        },
+        "34": {
+            "type": "collision",
+            "x": 2,
+            "y": 2
         },
         "66": {
             "type": "collision",
@@ -58,30 +73,35 @@
             "x": 2,
             "y": 5
         },
-        "98": {
-            "type": "collision",
-            "x": 2,
-            "y": 6
-        },
         "114": {
             "type": "collision",
             "x": 2,
             "y": 7
+        },
+        "98": {
+            "type": "collision",
+            "x": 2,
+            "y": 6
         },
         "130": {
             "type": "collision",
             "x": 2,
             "y": 8
         },
+        "146": {
+            "type": "collision",
+            "x": 2,
+            "y": 9
+        },
         "162": {
             "type": "collision",
             "x": 2,
             "y": 10
         },
-        "146": {
+        "178": {
             "type": "collision",
             "x": 2,
-            "y": 9
+            "y": 11
         },
         "179": {
             "type": "collision",
@@ -143,50 +163,65 @@
             "x": 14,
             "y": 11
         },
-        "174": {
+        "30": {
             "type": "collision",
             "x": 14,
-            "y": 10
-        },
-        "178": {
-            "type": "collision",
-            "x": 2,
-            "y": 11
-        },
-        "18": {
-            "type": "collision",
-            "x": 2,
-            "y": 1
-        },
-        "26": {
-            "type": "collision",
-            "x": 10,
-            "y": 1
-        },
-        "27": {
-            "type": "collision",
-            "x": 11,
-            "y": 1
-        },
-        "44": {
-            "type": "collision",
-            "x": 12,
-            "y": 2
-        },
-        "45": {
-            "type": "collision",
-            "x": 13,
-            "y": 2
-        },
-        "28": {
-            "type": "collision",
-            "x": 12,
             "y": 1
         },
         "46": {
             "type": "collision",
             "x": 14,
             "y": 2
+        },
+        "29": {
+            "type": "collision",
+            "x": 13,
+            "y": 1
+        },
+        "27": {
+            "type": "normal",
+            "x": 11,
+            "y": 1
+        },
+        "28": {
+            "type": "collision",
+            "x": 12,
+            "y": 1
+        },
+        "44": {
+            "type": "normal",
+            "x": 12,
+            "y": 2
+        },
+        "45": {
+            "type": "normal",
+            "x": 13,
+            "y": 2
+        },
+        "9": {
+            "type": "collision",
+            "x": 9,
+            "y": 0
+        },
+        "10": {
+            "type": "collision",
+            "x": 10,
+            "y": 0
+        },
+        "11": {
+            "type": "collision",
+            "x": 11,
+            "y": 0
+        },
+        "26": {
+            "type": "normal",
+            "x": 10,
+            "y": 1
+        },
+        "12": {
+            "type": "collision",
+            "x": 12,
+            "y": 0
         },
         "62": {
             "type": "collision",
@@ -198,15 +233,15 @@
             "x": 14,
             "y": 4
         },
-        "94": {
-            "type": "collision",
-            "x": 14,
-            "y": 5
-        },
         "110": {
             "type": "collision",
             "x": 14,
             "y": 6
+        },
+        "94": {
+            "type": "collision",
+            "x": 14,
+            "y": 5
         },
         "126": {
             "type": "collision",
@@ -223,90 +258,39 @@
             "x": 14,
             "y": 9
         },
-        "9": {
-            "type": "normal",
-            "x": 9,
-            "y": 0
+        "174": {
+            "type": "collision",
+            "x": 14,
+            "y": 10
         },
         "38": {
-            "type": "dialog",
+            "type": "normal",
             "x": 6,
             "y": 2
-        },
-        "39": {
-            "type": "dialog",
-            "x": 7,
-            "y": 2
-        },
-        "40": {
-            "type": "dialog",
-            "x": 8,
-            "y": 2
-        },
-        "41": {
-            "type": "dialog",
-            "x": 9,
-            "y": 2
-        },
-        "172": {
-            "type": "dialog",
-            "x": 12,
-            "y": 10
-        },
-        "173": {
-            "type": "dialog",
-            "x": 13,
-            "y": 10
-        },
-        "60": {
-            "type": "dialog",
-            "x": 12,
-            "y": 3
-        },
-        "61": {
-            "type": "dialog",
-            "x": 13,
-            "y": 3
-        },
-        "35": {
-            "type": "dialog",
-            "x": 3,
-            "y": 2
-        },
-        "36": {
-            "type": "dialog",
-            "x": 4,
-            "y": 2
-        },
-        "37": {
-            "type": "dialog",
-            "x": 5,
-            "y": 2
-        },
-        "2": {
-            "type": "collision",
-            "x": 2,
-            "y": 0
-        },
-        "3": {
-            "type": "collision",
-            "x": 3,
-            "y": 0
-        },
-        "4": {
-            "type": "collision",
-            "x": 4,
-            "y": 0
-        },
-        "5": {
-            "type": "collision",
-            "x": 5,
-            "y": 0
-        },
-        "6": {
-            "type": "collision",
-            "x": 6,
-            "y": 0
+        }
+    },
+    "dialog_groups": {
+        "firstpaper": {
+            "dialogs": [
+                {
+                    "text": "Test",
+                    "character": "D",
+                    "expression": null,
+                    "choices": false,
+                    "wait": true
+                }
+            ],
+            "cells": [
+                38,
+                38,
+                39,
+                38,
+                39,
+                55,
+                38,
+                38,
+                38
+            ]
         }
     }
 }
