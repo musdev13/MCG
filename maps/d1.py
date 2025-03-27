@@ -37,7 +37,7 @@ class d1:
         )
 
         # Add collision blocks
-        self.collisionBlocks = [22, 25, 18, 50, 34, 66, 82, 114, 98, 130, 146, 162, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 46, 27, 28, 44, 45, 26, 62, 78, 110, 94, 126, 142, 158, 174, 38, 39, 41, 40, 21, 20, 19]
+        self.collisionBlocks = [22, 25, 18, 50, 34, 66, 82, 114, 98, 130, 146, 162, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 46, 27, 28, 44, 45, 26, 62, 78, 110, 94, 126, 142, 158, 174, 38, 39, 41, 40, 21, 20, 19, 131, 132, 148, 164]
 
         # Initialize dialogs
         self.firstpaper = Dialog(screen, [["It's just a piece of paper with my plans.", 'D', 'None', 'False', 'True'], ['Why am I even focusing on this?', 'D', 'None', 'False', 'True']], self.player)
@@ -49,6 +49,7 @@ class d1:
         self.sideTables = Dialog(screen, [["They're nightstands.", 'D', 'None', 'False', 'True'], ['I keep my things and neatly folded clothes in them.', 'D', 'None', 'False', 'True']], self.player)
         self.inscriptions = Dialog(screen, [["There's some writing here", ' ', 'None', 'False', 'True'], ['Here are the names of your friends', ' ', 'None', 'False', 'True'], ["The first name is Marco. The second name is illegible, but it's probably Vlad", ' ', 'None', 'False', 'True']], self.player)
         self.catCarpet = Dialog(screen, [["It's just a cute little cat-shaped rug.", ' ', 'None', 'False', 'True']], self.player)
+        self.bed = Dialog(screen, [["It's just my bed.", 'D', 'None', 'False', 'True']], self.player)
 
         # Run startup script
         # Initialize fade surfaces
@@ -144,6 +145,8 @@ class d1:
                             self.inscriptions.start_dialog()
                         if player_grid_index in [70, 86, 85, 101, 117, 118, 134, 135, 136, 137, 138, 139, 124, 108, 92, 75, 73, 74, 88, 87, 102, 103, 119, 120, 104, 89, 105, 90, 91, 107, 121, 106, 122, 123] and not self.catCarpet.is_active:
                             self.catCarpet.start_dialog()
+                        if player_grid_index in [115, 116, 133, 149, 165] and not self.bed.is_active:
+                            self.bed.start_dialog()
                         elif self.firstpaper.is_active:
                             if self.firstpaper.dialog_ended:
                                 self.firstpaper.current_index = 0
@@ -243,6 +246,17 @@ class d1:
                                 self.catCarpet.is_text_complete = False
                             else:
                                 self.catCarpet.next()
+                        elif self.bed.is_active:
+                            if self.bed.dialog_ended:
+                                self.bed.current_index = 0
+                                self.bed.dialog_ended = False
+                                self.bed.is_active = False
+                                self.bed.current_text = ""
+                                self.bed.display_text = ""
+                                self.bed.text_counter = 0
+                                self.bed.is_text_complete = False
+                            else:
+                                self.bed.next()
 
             self.screen.blit(self.bg_image, (0, 0))
             
@@ -273,6 +287,8 @@ class d1:
                 self.inscriptions.draw()
             if self.catCarpet.is_active:
                 self.catCarpet.draw()
+            if self.bed.is_active:
+                self.bed.draw()
 
             pygame.display.flip()
             #pygame.time.Clock().tick(60)
@@ -297,5 +313,6 @@ class d1:
             hasattr(self, "windows") and self.windows.is_active or
             hasattr(self, "sideTables") and self.sideTables.is_active or
             hasattr(self, "inscriptions") and self.inscriptions.is_active or
-            hasattr(self, "catCarpet") and self.catCarpet.is_active
+            hasattr(self, "catCarpet") and self.catCarpet.is_active or
+            hasattr(self, "bed") and self.bed.is_active
         ])
