@@ -326,34 +326,50 @@ class MapMaker:
             filetypes=[("JSON files", "*.json")]
         )
         if file_path:
-            map_data = {
-                "background": os.path.basename(self.bg_path),
-                "player_skin": self.skin_var.get(),
-                "player_spawn": self.player_spawn,
-                "cells": self.cells,
-                "dialog_groups": self.dialog_groups  # Add dialog groups to save data
-            }
-            
-            # Create map directory if it doesn't exist
-            map_name = os.path.splitext(os.path.basename(file_path))[0]
-            map_dir = f"../img/{map_name}"
-            os.makedirs(map_dir, exist_ok=True)
-            
-            # Copy background image
-            shutil.copy2(self.bg_path, f"{map_dir}/bg.png")
-            
-            # Save map data
-            with open(file_path, "w") as f:
-                json.dump(map_data, f, indent=4)
+            try:
+                map_data = {
+                    "background": os.path.basename(self.bg_path),
+                    "player_skin": self.skin_var.get(),
+                    "player_spawn": self.player_spawn,
+                    "cells": self.cells,
+                    "dialog_groups": self.dialog_groups
+                }
+                
+                # Create map directory if it doesn't exist
+                map_name = os.path.splitext(os.path.basename(file_path))[0]
+                map_dir = f"../img/{map_name}"
+                os.makedirs(map_dir, exist_ok=True)
+                
+                # Handle background image copy
+                try:
+                    # First try to copy directly
+                    shutil.copy2(self.bg_path, f"{map_dir}/bg.png")
+                except PermissionError:
+                    # If direct copy fails, try to create a new copy
+                    with Image.open(self.bg_path) as img:
+                        img.save(f"{map_dir}/bg.png")
+                
+                # Save map data
+                with open(file_path, "w") as f:
+                    json.dump(map_data, f, indent=4)
+                    
+                tk.messagebox.showinfo("Success", "Map saved successfully!")
+                
+            except Exception as e:
+                tk.messagebox.showerror("Error", f"Failed to save map: {str(e)}")
                 
     def load_map(self):
-        file_path = filedialog.askopenfilename(
-            filetypes=[("JSON files", "*.json")]
-        )
-        if file_path:
+        try:
+            file_path = filedialog.askopenfilename(
+                filetypes=[("JSON files", "*.json")]
+            )
+            if not file_path:
+                return
+                
+            # Use context manager to ensure file is closed
             with open(file_path, "r") as f:
                 map_data = json.load(f)
-                
+            
             map_name = os.path.splitext(os.path.basename(file_path))[0]
             bg_path = f"../img/{map_name}/bg.png"
             
@@ -361,16 +377,16 @@ class MapMaker:
                 self.bg_path = bg_path
                 # Load and process background image
                 original_image = Image.open(bg_path)
-                # Resize to 800x600 like in update_background
                 image = original_image.resize((800, 600))
+                original_image.close()  # Close the image file
                 
                 self.bg_image = ImageTk.PhotoImage(image)
                 self.canvas.delete("all")
                 
-                # Draw background centered like in update_background
+                # Draw background centered
                 self.canvas.create_image(
-                    (800 - 768) // 2,  # Center horizontally
-                    (600 - 576) // 2,  # Center vertically
+                    (800 - 768) // 2,
+                    (600 - 576) // 2,
                     anchor=tk.NW,
                     image=self.bg_image
                 )
@@ -382,12 +398,12 @@ class MapMaker:
                 self.cells = map_data["cells"]
                 self.dialog_groups = map_data.get("dialog_groups", {})
                 
-                # Draw grid and cells with proper offsets
                 self.draw_grid()
                 self.redraw_cells()
-                
-                # Update dialog groups in UI
                 self.update_dialog_group_list()
+                
+        except Exception as e:
+            tk.messagebox.showerror("Error", f"Failed to load map: {str(e)}")
             
     def redraw_cells(self):
         self.canvas.delete("cell")
