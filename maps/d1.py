@@ -42,7 +42,8 @@ class d1:
         # Initialize dialogs
         self.firstpaper = Dialog(screen, [['First Dialog', 'D', 'None', 'False', 'True'], ['Nothing new', 'D', 'None', 'False', 'True']], self.player)
         self.second_papers = Dialog(screen, [['Second dialogs', 'D', 'None', 'False', 'True']], self.player)
-        self.intro = Dialog(screen, [['Text1', 'D', 'None', 'False', 'True'], ['Text2', 'D', 'None', 'False', 'True']], self.player)
+        self.intro = Dialog(screen, [['Well, new day, new events!', 'D', 'None', 'False', 'True'], ['Hmm...', 'D', 'None', 'False', 'True'], ['first I need to figure out what to do.', 'D', 'None', 'False', 'True']], self.player)
+        self.intro1 = Dialog(screen, [['Right!', 'D', 'None', 'False', 'True'], ['I can go and socialize with someone, after all this time....', 'D', 'None', 'False', 'True']], self.player)
 
         # Run startup script
         # Initialize fade surfaces
@@ -72,6 +73,14 @@ class d1:
             #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass
         self.intro.start_dialog()
+        start_time = time.time()
+        while time.time() - start_time < 2:
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            pygame.display.flip()
+            #pygame.time.Clock().tick(60)
+            for event in pygame.event.get(): pass
+        self.intro1.start_dialog()
         self.cutscene_active = False
 
     def draw(self):
@@ -120,6 +129,17 @@ class d1:
                                 self.intro.is_text_complete = False
                             else:
                                 self.intro.next()
+                        elif self.intro1.is_active:
+                            if self.intro1.dialog_ended:
+                                self.intro1.current_index = 0
+                                self.intro1.dialog_ended = False
+                                self.intro1.is_active = False
+                                self.intro1.current_text = ""
+                                self.intro1.display_text = ""
+                                self.intro1.text_counter = 0
+                                self.intro1.is_text_complete = False
+                            else:
+                                self.intro1.next()
 
             self.screen.blit(self.bg_image, (0, 0))
             
@@ -138,6 +158,8 @@ class d1:
                 self.second_papers.draw()
             if self.intro.is_active:
                 self.intro.draw()
+            if self.intro1.is_active:
+                self.intro1.draw()
 
             pygame.display.flip()
             #pygame.time.Clock().tick(60)
@@ -156,5 +178,6 @@ class d1:
         return any([
             hasattr(self, "firstpaper") and self.firstpaper.is_active or
             hasattr(self, "second_papers") and self.second_papers.is_active or
-            hasattr(self, "intro") and self.intro.is_active
+            hasattr(self, "intro") and self.intro.is_active or
+            hasattr(self, "intro1") and self.intro1.is_active
         ])

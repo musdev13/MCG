@@ -369,13 +369,36 @@
         "intro": {
             "dialogs": [
                 {
-                    "text": "Text1",
+                    "text": "Well, new day, new events!",
                     "character": "D",
                     "expression": null,
                     "wait": true
                 },
                 {
-                    "text": "Text2",
+                    "text": "Hmm...",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                },
+                {
+                    "text": "first I need to figure out what to do.",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                }
+            ],
+            "cells": []
+        },
+        "intro1": {
+            "dialogs": [
+                {
+                    "text": "Right!",
+                    "character": "D",
+                    "expression": null,
+                    "wait": true
+                },
+                {
+                    "text": "I can go and socialize with someone, after all this time....",
                     "character": "D",
                     "expression": null,
                     "wait": true
@@ -384,5 +407,5 @@
             "cells": []
         }
     },
-    "startup_script": "playerCantMove();\nfadeIn(3);\nwait(2);\ndialog(\"intro\");\nplayerCanMove();"
+    "startup_script": "playerCantMove();\nfadeIn(3);\nwait(2);\ndialog(\"intro\");\nwait(2);\ndialog(\"intro1\");\nplayerCanMove();"
 }
