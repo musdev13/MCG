@@ -774,9 +774,14 @@ class {map_name}:
         next_checks = []
         for group_name in self.dialog_groups.keys():
             next_checks.append(f'''                        elif self.{group_name}.is_active:
-                            if self.{group_name}.current_index == len(self.{group_name}.dialog_data) - 1:
-                                self.{group_name}.next()
-                                self.{group_name}.current_index = 0  # Reset index
+                            if self.{group_name}.dialog_ended:
+                                self.{group_name}.current_index = 0
+                                self.{group_name}.dialog_ended = False
+                                self.{group_name}.is_active = False
+                                self.{group_name}.current_text = ""
+                                self.{group_name}.display_text = ""
+                                self.{group_name}.text_counter = 0
+                                self.{group_name}.is_text_complete = False
                             else:
                                 self.{group_name}.next()''')
         return "\n".join(next_checks)

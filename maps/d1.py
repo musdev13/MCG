@@ -101,14 +101,24 @@ class d1:
                         if player_grid_index in [56, 57] and not self.second_papers.is_active:
                             self.second_papers.start_dialog()
                         elif self.firstpaper.is_active:
-                            if self.firstpaper.current_index == len(self.firstpaper.dialog_data) - 1:
-                                self.firstpaper.next()
-                                self.firstpaper.current_index = 0  # Reset index
+                            if self.firstpaper.dialog_ended:
+                                self.firstpaper.current_index = 0
+                                self.firstpaper.dialog_ended = False
+                                self.firstpaper.is_active = False
+                                self.firstpaper.current_text = ""
+                                self.firstpaper.display_text = ""
+                                self.firstpaper.text_counter = 0
+                                self.firstpaper.is_text_complete = False
                             else:
                                 self.firstpaper.next()
                         elif self.second_papers.is_active:
-                            if self.second_papers.current_index == len(self.second_papers.dialog_data) - 1:
-                                self.second_papers.next()
-                                self.second_papers.current_index = 0  # Reset index
+                            if self.second_papers.dialog_ended:
+                                self.second_papers.current_index = 0
+                                self.second_papers.dialog_ended = False
+                                self.second_papers.is_active = False
+                                self.second_papers.current_text = ""
+                                self.second_papers.display_text = ""
+                                self.second_papers.text_counter = 0
+                                self.second_papers.is_text_complete = False
                             else:
                                 self.second_papers.next()
