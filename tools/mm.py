@@ -490,7 +490,7 @@ class MapMaker:
         if index < len(group["dialogs"]):
             current = group["dialogs"][index]
         else:
-            current = {"text": "", "character": "", "expression": None, "choices": False, "wait": True}
+            current = {"text": "", "character": "", "expression": None, "wait": True}
 
         # Dialog text
         ttk.Label(dialog, text="Text:").pack(pady=5)
@@ -502,14 +502,7 @@ class MapMaker:
         char_var = tk.StringVar(value=current["character"])
         ttk.Entry(dialog, textvariable=char_var).pack(pady=5)
 
-        # Options
-        choices_var = tk.BooleanVar(value=current["choices"])
-        ttk.Checkbutton(
-            dialog,
-            text="Has Choices",
-            variable=choices_var
-        ).pack(pady=5)
-
+        # Wait for input option
         wait_var = tk.BooleanVar(value=current["wait"])
         ttk.Checkbutton(
             dialog,
@@ -522,7 +515,6 @@ class MapMaker:
                 "text": text_var.get(),
                 "character": char_var.get(),
                 "expression": None,
-                "choices": choices_var.get(),
                 "wait": wait_var.get()
             }
             if index < len(group["dialogs"]):
