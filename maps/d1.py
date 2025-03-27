@@ -32,10 +32,11 @@ class d1:
         )
 
         # Add collision blocks
-        self.collisionBlocks = [22, 23, 24, 25, 6, 5, 4, 3, 2, 18, 50, 34, 66, 82, 114, 98, 130, 146, 162, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 30, 46, 29, 28, 9, 10, 11, 12, 62, 78, 110, 94, 126, 142, 158, 174]
+        self.collisionBlocks = [22, 25, 18, 50, 34, 66, 82, 114, 98, 130, 146, 162, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 46, 27, 28, 44, 45, 26, 62, 78, 110, 94, 126, 142, 158, 174, 38, 39, 41, 40, 21, 20, 19]
 
         # Initialize dialogs
-        self.firstpaper = Dialog(screen, [['Test', 'D', 'None', 'False', 'True']], self.player)
+        self.firstpaper = Dialog(screen, [['First Dialog', 'D', 'None', 'False', 'True'], ['Nothing new', 'D', 'None', 'False', 'True']], self.player)
+        self.second_papers = Dialog(screen, [['Second dialogs', 'D', 'None', 'False', 'True']], self.player)
 
     def check_collision(self, next_x, next_y):
         feet_x = next_x + self.player.sprite_width // 2
@@ -52,7 +53,8 @@ class d1:
 
     def is_any_dialog_active(self):
         return any([
-            hasattr(self, "firstpaper") and self.firstpaper.is_active
+            hasattr(self, "firstpaper") and self.firstpaper.is_active or
+            hasattr(self, "second_papers") and self.second_papers.is_active
         ])
 
     def get_player_grid_index(self):
@@ -80,10 +82,12 @@ class d1:
 
             if self.firstpaper.is_active:
                 self.firstpaper.draw()
+            if self.second_papers.is_active:
+                self.second_papers.draw()
 
             if Level.levelName == "d1":
                 pygame.display.flip()
-                pygame.time.Clock().tick(120)
+                # pygame.time.Clock().tick(120)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -92,7 +96,11 @@ class d1:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_z:
                         player_grid_index = self.get_player_grid_index()
-                        if player_grid_index in [38, 38, 39, 38, 39, 55, 38, 38, 38] and not self.firstpaper.is_active:
+                        if player_grid_index in [38, 38, 39, 38, 39, 55, 38, 38, 38, 54] and not self.firstpaper.is_active:
                             self.firstpaper.start_dialog()
+                        if player_grid_index in [56, 57] and not self.second_papers.is_active:
+                            self.second_papers.start_dialog()
                         elif self.firstpaper.is_active:
                             self.firstpaper.next()
+                        elif self.second_papers.is_active:
+                            self.second_papers.next()

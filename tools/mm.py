@@ -629,7 +629,7 @@ class {map_name}:
 
             if Level.levelName == "{map_name}":
                 pygame.display.flip()
-                pygame.time.Clock().tick(120)
+                #pygame.time.Clock().tick(120)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
