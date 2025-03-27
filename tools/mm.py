@@ -59,7 +59,8 @@ class MapMaker:
             ("Normal Cell", "normal"),
             ("Collision", "collision"),
             ("Player Spawn", "spawn"),
-            ("Dialog Trigger", "dialog")
+            ("Dialog Trigger", "dialog"),
+            ("Script Trigger", "script")  # Add new tool type
         ]
         
         for text, value in tools:
@@ -298,6 +299,8 @@ class MapMaker:
                 # Draw the cell
                 self.draw_cell(x, y, "blue", cell_index)
                 
+            elif self.current_tool == "script":
+                self.edit_script_trigger(cell_index, x, y)
             else:
                 # Handle other cell types
                 self.cells[cell_index] = {
@@ -445,7 +448,8 @@ class MapMaker:
             color = {
                 "normal": "",
                 "collision": "red",
-                "dialog": "blue"
+                "dialog": "blue",
+                "script": "purple"  # Add script type with purple color
             }[cell["type"]]
             
             if color:
@@ -702,6 +706,8 @@ class {map_name}:
         # Run startup script
 {self.parse_script()}
 
+{self.parse_script_method()}
+
     def draw(self):
         while self.running:
             for event in pygame.event.get():
@@ -712,6 +718,7 @@ class {map_name}:
                     if event.key == pygame.K_z:
                         player_grid_index = self.get_player_grid_index()
 {self.generate_dialog_triggers()}
+{self.generate_script_triggers()}
 {self.generate_dialog_next_checks()}
 
             self.screen.blit(self.bg_image, (0, 0))
@@ -841,16 +848,21 @@ playerCanMove();"""
         if not script:
             return ""
             
-        lines = script.split("\n")
-        parsed_lines = []
+        # Split by newlines and semicolons
+        lines = []
+        for line in script.split("\n"):
+            # Split line by semicolons and strip whitespace
+            commands = [cmd.strip() for cmd in line.split(";") if cmd.strip()]
+            lines.extend(commands)
         
-        # Add fade surface initialization with proper indentation
+        parsed_lines = []
         parsed_lines.append("        # Initialize fade surfaces")
         parsed_lines.append("        self.black_surface = pygame.Surface((800, 600))")
         parsed_lines.append("        self.black_surface.fill((0, 0, 0))")
         
         for line in lines:
-            line = line.strip().rstrip(";")
+            # Remove trailing semicolon if present
+            line = line.rstrip(";")
             if line:
                 if line.startswith("dialog("):
                     group = line[7:-1].strip('"\'')
@@ -935,6 +947,122 @@ playerCanMove();"""
         
         return "\n".join(parsed_lines)
 
+    def edit_script_trigger(self, cell_index, x, y):
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Edit Script Trigger")
+        dialog.grab_set()
+
+        # Get existing script if any
+        current_script = ""
+        if cell_index in self.cells and self.cells[cell_index]["type"] == "script":
+            current_script = self.cells[cell_index].get("script", "")
+
+        ttk.Label(dialog, text="Enter script commands:").pack(pady=5)
+        script_text = tk.Text(dialog, height=10, width=40)
+        script_text.pack(padx=5, pady=5)
+        script_text.insert("1.0", current_script)
+
+        # Add help button
+        ttk.Button(
+            dialog,
+            text="Show Commands Help",
+            command=self.show_script_help
+        ).pack(fill=tk.X, pady=2, padx=5)
+
+        def save():
+            script = script_text.get("1.0", tk.END).strip()
+            if script:
+                self.cells[cell_index] = {
+                    "type": "script",
+                    "x": x,
+                    "y": y,
+                    "script": script
+                }
+                self.draw_cell(x, y, "purple", cell_index)  # Purple for script triggers
+            else:
+                if cell_index in self.cells:
+                    del self.cells[cell_index]
+                self.canvas.delete(f"cell_{cell_index}")
+            dialog.destroy()
+
+        ttk.Button(dialog, text="Save", command=save).pack(pady=5)
+
+    def generate_script_triggers(self):
+        triggers = []
+        for index, cell in self.cells.items():
+            if cell["type"] == "script":
+                triggers.append(f'''                        if player_grid_index == {index}:
+                            self.execute_script("""{cell["script"]}""")''')
+        return "\n".join(triggers)
+
+    def parse_script_method(self):
+        """Generate the execute_script method for handling script triggers"""
+        return '''    def execute_script(self, script):
+        # Split by newlines and semicolons
+        commands = []
+        for line in script.split("\\n"):
+            # Split line by semicolons and strip whitespace
+            commands.extend([cmd.strip() for cmd in line.split(";") if cmd.strip()])
+            
+        for line in commands:
+            line = line.strip()
+            if line:
+                if line.startswith("fadeIn("):
+                    duration = float(line[7:-1])
+                    start_time = time.time()
+                    while True:
+                        current_time = time.time() - start_time
+                        if current_time >= duration:
+                            break
+                        fade_alpha = max(0, 255 * (1 - current_time / duration))
+                        fade_surface = self.black_surface.copy()
+                        fade_surface.set_alpha(int(fade_alpha))
+                        self.screen.blit(self.bg_image, (0, 0))
+                        self.player.draw(self.screen)
+                        self.screen.blit(fade_surface, (0, 0))
+                        pygame.display.flip()
+                        for event in pygame.event.get(): pass
+                elif line.startswith("fadeOut("):
+                    duration = float(line[8:-1])
+                    start_time = time.time()
+                    while True:
+                        current_time = time.time() - start_time
+                        if current_time >= duration:
+                            break
+                        fade_alpha = min(255, 255 * (current_time / duration))
+                        fade_surface = self.black_surface.copy()
+                        fade_surface.set_alpha(int(fade_alpha))
+                        self.screen.blit(self.bg_image, (0, 0))
+                        self.player.draw(self.screen)
+                        self.screen.blit(fade_surface, (0, 0))
+                        pygame.display.flip()
+                        for event in pygame.event.get(): pass
+                elif line.startswith("wait("):
+                    seconds = float(line[5:-1])
+                    start_time = time.time()
+                    while time.time() - start_time < seconds:
+                        self.screen.blit(self.bg_image, (0, 0))
+                        self.player.draw(self.screen)
+                        pygame.display.flip()
+                        for event in pygame.event.get(): pass
+                elif line.startswith("dialog("):
+                    group = line[7:-1].strip('"\\'"')
+                    dialog = getattr(self, group)
+                    dialog.start_dialog()
+                    while dialog.is_active:
+                        for event in pygame.event.get():
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_z:
+                                    dialog.next()
+                        self.screen.blit(self.bg_image, (0, 0))
+                        self.player.draw(self.screen)
+                        if dialog.is_active:
+                            dialog.draw()
+                        pygame.display.flip()
+                elif line == "playerCantMove()":
+                    self.cutscene_active = True
+                elif line == "playerCanMove()":
+                    self.cutscene_active = False'''
 if __name__ == "__main__":
     root = tk.Tk()
     app = MapMaker(root)

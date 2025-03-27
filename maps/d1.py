@@ -37,7 +37,7 @@ class d1:
         )
 
         # Add collision blocks
-        self.collisionBlocks = [22, 25, 18, 50, 34, 66, 82, 114, 98, 130, 146, 162, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 46, 27, 28, 44, 45, 26, 62, 78, 110, 94, 126, 142, 158, 174, 38, 39, 41, 40, 21, 20, 19, 131, 132, 148, 164]
+        self.collisionBlocks = [22, 25, 18, 50, 34, 66, 82, 114, 98, 130, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 46, 27, 28, 44, 45, 26, 62, 78, 110, 94, 126, 142, 158, 174, 38, 39, 41, 40, 21, 20, 19, 131, 132, 148, 164]
 
         # Initialize dialogs
         self.firstpaper = Dialog(screen, [["It's just a piece of paper with my plans.", 'D', 'None', 'False', 'True'], ['Why am I even focusing on this?', 'D', 'None', 'False', 'True']], self.player)
@@ -124,6 +124,73 @@ class d1:
             pygame.display.flip()
         self.cutscene_active = False
 
+    def execute_script(self, script):
+        # Split by newlines and semicolons
+        commands = []
+        for line in script.split("\n"):
+            # Split line by semicolons and strip whitespace
+            commands.extend([cmd.strip() for cmd in line.split(";") if cmd.strip()])
+            
+        for line in commands:
+            line = line.strip()
+            if line:
+                if line.startswith("fadeIn("):
+                    duration = float(line[7:-1])
+                    start_time = time.time()
+                    while True:
+                        current_time = time.time() - start_time
+                        if current_time >= duration:
+                            break
+                        fade_alpha = max(0, 255 * (1 - current_time / duration))
+                        fade_surface = self.black_surface.copy()
+                        fade_surface.set_alpha(int(fade_alpha))
+                        self.screen.blit(self.bg_image, (0, 0))
+                        self.player.draw(self.screen)
+                        self.screen.blit(fade_surface, (0, 0))
+                        pygame.display.flip()
+                        for event in pygame.event.get(): pass
+                elif line.startswith("fadeOut("):
+                    duration = float(line[8:-1])
+                    start_time = time.time()
+                    while True:
+                        current_time = time.time() - start_time
+                        if current_time >= duration:
+                            break
+                        fade_alpha = min(255, 255 * (current_time / duration))
+                        fade_surface = self.black_surface.copy()
+                        fade_surface.set_alpha(int(fade_alpha))
+                        self.screen.blit(self.bg_image, (0, 0))
+                        self.player.draw(self.screen)
+                        self.screen.blit(fade_surface, (0, 0))
+                        pygame.display.flip()
+                        for event in pygame.event.get(): pass
+                elif line.startswith("wait("):
+                    seconds = float(line[5:-1])
+                    start_time = time.time()
+                    while time.time() - start_time < seconds:
+                        self.screen.blit(self.bg_image, (0, 0))
+                        self.player.draw(self.screen)
+                        pygame.display.flip()
+                        for event in pygame.event.get(): pass
+                elif line.startswith("dialog("):
+                    group = line[7:-1].strip('"\'"')
+                    dialog = getattr(self, group)
+                    dialog.start_dialog()
+                    while dialog.is_active:
+                        for event in pygame.event.get():
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_z:
+                                    dialog.next()
+                        self.screen.blit(self.bg_image, (0, 0))
+                        self.player.draw(self.screen)
+                        if dialog.is_active:
+                            dialog.draw()
+                        pygame.display.flip()
+                elif line == "playerCantMove()":
+                    self.cutscene_active = True
+                elif line == "playerCanMove()":
+                    self.cutscene_active = False
+
     def draw(self):
         while self.running:
             for event in pygame.event.get():
@@ -147,6 +214,8 @@ class d1:
                             self.catCarpet.start_dialog()
                         if player_grid_index in [115, 116, 133, 149, 165] and not self.bed.is_active:
                             self.bed.start_dialog()
+                        if player_grid_index == 170:
+                            self.execute_script("""wait(2); dialog("intro");""")
                         elif self.firstpaper.is_active:
                             if self.firstpaper.dialog_ended:
                                 self.firstpaper.current_index = 0

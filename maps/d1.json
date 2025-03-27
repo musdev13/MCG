@@ -89,22 +89,22 @@
             "y": 8
         },
         "146": {
-            "type": "collision",
+            "type": "normal",
             "x": 2,
             "y": 9
         },
         "162": {
-            "type": "collision",
+            "type": "normal",
             "x": 2,
             "y": 10
         },
         "178": {
-            "type": "collision",
+            "type": "normal",
             "x": 2,
             "y": 11
         },
         "179": {
-            "type": "collision",
+            "type": "normal",
             "x": 3,
             "y": 11
         },
@@ -568,26 +568,6 @@
             "y": 7,
             "dialog_group": "catCarpet"
         },
-        "146": {
-            "type": "normal",
-            "x": 2,
-            "y": 9
-        },
-        "162": {
-            "type": "normal",
-            "x": 2,
-            "y": 10
-        },
-        "178": {
-            "type": "normal",
-            "x": 2,
-            "y": 11
-        },
-        "179": {
-            "type": "normal",
-            "x": 3,
-            "y": 11
-        },
         "131": {
             "type": "collision",
             "x": 3,
@@ -637,6 +617,18 @@
             "x": 5,
             "y": 10,
             "dialog_group": "bed"
+        },
+        "170": {
+            "type": "script",
+            "x": 10,
+            "y": 10,
+            "script": "wait(2)\ndialog(\"intro\")"
+        },
+        "170": {
+            "type": "script",
+            "x": 10,
+            "y": 10,
+            "script": "wait(2); dialog(\"intro\");"
         }
     },
     "dialog_groups": {
