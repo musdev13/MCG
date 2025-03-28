@@ -94,6 +94,41 @@ class d1:
             self.player.draw(self.screen)
             pygame.display.flip()
             for event in pygame.event.get(): pass
+        # Change player sprite
+        print(f"Changing sprite to: player/d/idle_l")
+        self.player.change_sprite("player/d/idle_l")
+        self.screen.blit(self.bg_image, (0, 0))
+        self.player.draw(self.screen)
+        pygame.display.flip()
+        start_time = time.time()
+        while time.time() - start_time < 2:
+            self.screen.blit(self.bg_image, (0, 0))
+            self.player.draw(self.screen)
+            pygame.display.flip()
+            for event in pygame.event.get(): pass
+        # Reset player sprites
+        skin_type = self.player.skin_type
+        sprite_path = f"{gamePath}/img/player/{self.player.skin_type}/idle_"
+        
+        # Reset all sprites to default
+        self.player.sprites = {
+            'up': pygame.transform.scale(pygame.image.load(f"{sprite_path}u.png"), (96, 96)),
+            'up1': pygame.transform.scale(pygame.image.load(f"{sprite_path}u1.png"), (96, 96)),
+            'up2': pygame.transform.scale(pygame.image.load(f"{sprite_path}u2.png"), (96, 96)),
+            'down': pygame.transform.scale(pygame.image.load(f"{sprite_path}d.png"), (96, 96)),
+            'down1': pygame.transform.scale(pygame.image.load(f"{sprite_path}d1.png"), (96, 96)),
+            'down2': pygame.transform.scale(pygame.image.load(f"{sprite_path}d2.png"), (96, 96)),
+            'left': pygame.transform.scale(pygame.image.load(f"{sprite_path}l.png"), (96, 96)),
+            'left1': pygame.transform.scale(pygame.image.load(f"{sprite_path}l1.png"), (96, 96)),
+            'left2': pygame.transform.scale(pygame.image.load(f"{sprite_path}l2.png"), (96, 96)),
+            'right': pygame.transform.scale(pygame.image.load(f"{sprite_path}r.png"), (96, 96)),
+            'right1': pygame.transform.scale(pygame.image.load(f"{sprite_path}r1.png"), (96, 96)),
+            'right2': pygame.transform.scale(pygame.image.load(f"{sprite_path}r2.png"), (96, 96))
+        }
+        self.player.current_sprite = self.player.sprites[self.player.direction]
+        self.screen.blit(self.bg_image, (0, 0))
+        self.player.draw(self.screen)
+        pygame.display.flip()
         self.intro1.start_dialog()
         while self.intro1.is_active:
             for event in pygame.event.get():
@@ -191,12 +226,9 @@ class d1:
                 elif line == "playerCanMove()":
                     self.cutscene_active = False
                 elif line.startswith("changeSprite("):
-                    # Extract sprite path without extra quotes
                     sprite_path = line[12:-1].strip()  # Remove changeSprite( and )
                     if sprite_path.startswith('"') or sprite_path.startswith("'"):
-                        sprite_path = sprite_path[1:-1]
-                    sprite_path = sprite_path[2:]  # Remove first 2 characters in addition to quotes
-                    sprite_path = sprite_path[:-1]
+                        sprite_path = sprite_path[1:-1]  # Remove quotes
                     print(f"Changing sprite to path: {sprite_path}")
                     self.player.change_sprite(sprite_path)
                     # Redraw to show the change immediately

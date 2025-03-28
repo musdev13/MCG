@@ -856,7 +856,7 @@
             ]
         }
     },
-    "startup_script": "playerCantMove();\nfadeIn(3);\nwait(2);\ndialog(\"intro\");\nwait(2);\ndialog(\"intro1\");\nwait(3);\ndialog(\"intro2\");\nplayerCanMove();",
+    "startup_script": "playerCantMove();\nfadeIn(3);\nwait(2);\ndialog(\"intro\");\nwait(2);\nchangeSprite(\"player/d/idle_l\");\nwait(2);\nresetSprite();\ndialog(\"intro1\");\nwait(3);\ndialog(\"intro2\");\nplayerCanMove();",
     "script_groups": {
         "door": {
             "script": "wait(2); dialog(\"intro\"); wait(2); changeSprite(\"player/d/idle_l\"); wait(2); resetSprite();",
