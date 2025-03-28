@@ -876,6 +876,7 @@ dialog(groupName) - Start dialog from group
 playerCantMove() - Disable player movement
 playerCanMove() - Enable player movement
 changeSprite(path) - Change player sprite (e.g. "player/d/idle_l")
+resetSprite() - Reset player sprite to default animation set
 
 Example:
 playerCantMove();
@@ -883,8 +884,9 @@ fadeIn(3);
 wait(2);
 dialog("intro");
 changeSprite("player/d/idle_l");
+wait(1);
+resetSprite();
 playerCanMove();"""
-
         dialog = tk.Toplevel(self.root)
         dialog.title("Script Commands Help")
         dialog.grab_set()
@@ -1121,8 +1123,33 @@ playerCanMove();"""
                     if sprite_path.startswith('"') or sprite_path.startswith("'"):
                         sprite_path = sprite_path[1:-1]
                     sprite_path = sprite_path[2:]  # Remove first 2 characters in addition to quotes
+                    sprite_path = sprite_path[:-1]
                     print(f"Changing sprite to path: {sprite_path}")
                     self.player.change_sprite(sprite_path)
+                    # Redraw to show the change immediately
+                    self.screen.blit(self.bg_image, (0, 0))
+                    self.player.draw(self.screen)
+                    pygame.display.flip()
+                elif line == "resetSprite()":
+                    skin_type = self.player.skin_type
+                    sprite_path = f"{gamePath}/img/player/{'d/' if skin_type == 'd' else ''}idle_"
+                    
+                    # Reset all sprites to default
+                    self.player.sprites = {
+                        'up': pygame.transform.scale(pygame.image.load(f"{sprite_path}u.png"), (96, 96)),
+                        'up1': pygame.transform.scale(pygame.image.load(f"{sprite_path}u1.png"), (96, 96)),
+                        'up2': pygame.transform.scale(pygame.image.load(f"{sprite_path}u2.png"), (96, 96)),
+                        'down': pygame.transform.scale(pygame.image.load(f"{sprite_path}d.png"), (96, 96)),
+                        'down1': pygame.transform.scale(pygame.image.load(f"{sprite_path}d1.png"), (96, 96)),
+                        'down2': pygame.transform.scale(pygame.image.load(f"{sprite_path}d2.png"), (96, 96)),
+                        'left': pygame.transform.scale(pygame.image.load(f"{sprite_path}l.png"), (96, 96)),
+                        'left1': pygame.transform.scale(pygame.image.load(f"{sprite_path}l1.png"), (96, 96)),
+                        'left2': pygame.transform.scale(pygame.image.load(f"{sprite_path}l2.png"), (96, 96)),
+                        'right': pygame.transform.scale(pygame.image.load(f"{sprite_path}r.png"), (96, 96)),
+                        'right1': pygame.transform.scale(pygame.image.load(f"{sprite_path}r1.png"), (96, 96)),
+                        'right2': pygame.transform.scale(pygame.image.load(f"{sprite_path}r2.png"), (96, 96))
+                    }
+                    self.player.current_sprite = self.player.sprites[self.player.direction]
                     # Redraw to show the change immediately
                     self.screen.blit(self.bg_image, (0, 0))
                     self.player.draw(self.screen)

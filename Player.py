@@ -200,7 +200,6 @@ class Player:
     def change_sprite(self, sprite_path):
         """Change player sprite to a specific image path"""
         try:
-            sprite_path = sprite_path[:-1]
             base_path = f"{gamePath}/img/{sprite_path}"
             print(f"Loading sprite from: {base_path}")
             
