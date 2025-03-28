@@ -622,12 +622,6 @@
             "type": "script",
             "x": 10,
             "y": 10,
-            "script": "wait(2); dialog(\"intro\");"
-        },
-        "170": {
-            "type": "script",
-            "x": 10,
-            "y": 10,
             "script_group": "door"
         }
     },
@@ -865,7 +859,7 @@
     "startup_script": "playerCantMove();\nfadeIn(3);\nwait(2);\ndialog(\"intro\");\nwait(2);\ndialog(\"intro1\");\nwait(3);\ndialog(\"intro2\");\nplayerCanMove();",
     "script_groups": {
         "door": {
-            "script": "wait(2); dialog(\"intro\");",
+            "script": "wait(2); dialog(\"intro\"); changeSprite(\"player/d/idle_l\");",
             "cells": [
                 170
             ]

@@ -190,6 +190,18 @@ class d1:
                     self.cutscene_active = True
                 elif line == "playerCanMove()":
                     self.cutscene_active = False
+                elif line.startswith("changeSprite("):
+                    # Extract sprite path without extra quotes
+                    sprite_path = line[12:-1].strip()  # Remove changeSprite( and )
+                    if sprite_path.startswith('"') or sprite_path.startswith("'"):
+                        sprite_path = sprite_path[1:-1]
+                    sprite_path = sprite_path[2:]  # Remove first 2 characters in addition to quotes
+                    print(f"Changing sprite to path: {sprite_path}")
+                    self.player.change_sprite(sprite_path)
+                    # Redraw to show the change immediately
+                    self.screen.blit(self.bg_image, (0, 0))
+                    self.player.draw(self.screen)
+                    pygame.display.flip()
 
     def draw(self):
         while self.running:
@@ -215,7 +227,7 @@ class d1:
                         if player_grid_index in [115, 116, 133, 149, 165] and not self.bed.is_active:
                             self.bed.start_dialog()
                         if player_grid_index in [170]:
-                            self.execute_script("""wait(2); dialog("intro");""")
+                            self.execute_script("""wait(2); dialog("intro"); changeSprite("player/d/idle_l");""")
                         elif self.firstpaper.is_active:
                             if self.firstpaper.dialog_ended:
                                 self.firstpaper.current_index = 0

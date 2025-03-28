@@ -174,3 +174,47 @@ class Player:
     
     def draw(self, screen):
         screen.blit(self.current_sprite, (self.x, self.y))
+
+    def change_skin(self, new_skin_type):
+        """Change player skin and reload sprites"""
+        self.skin_type = new_skin_type
+        sprite_path = f"{gamePath}/img/player/{'d/' if new_skin_type == 'd' else ''}idle_"
+        
+        # Reload all sprites with new skin
+        self.sprites = {
+            'up': pygame.transform.scale(pygame.image.load(f"{sprite_path}u.png"), (96, 96)),
+            'up1': pygame.transform.scale(pygame.image.load(f"{sprite_path}u1.png"), (96, 96)),
+            'up2': pygame.transform.scale(pygame.image.load(f"{sprite_path}u2.png"), (96, 96)),
+            'down': pygame.transform.scale(pygame.image.load(f"{sprite_path}d.png"), (96, 96)),
+            'down1': pygame.transform.scale(pygame.image.load(f"{sprite_path}d1.png"), (96, 96)),
+            'down2': pygame.transform.scale(pygame.image.load(f"{sprite_path}d2.png"), (96, 96)),
+            'left': pygame.transform.scale(pygame.image.load(f"{sprite_path}l.png"), (96, 96)),
+            'left1': pygame.transform.scale(pygame.image.load(f"{sprite_path}l1.png"), (96, 96)),
+            'left2': pygame.transform.scale(pygame.image.load(f"{sprite_path}l2.png"), (96, 96)),
+            'right': pygame.transform.scale(pygame.image.load(f"{sprite_path}r.png"), (96, 96)),
+            'right1': pygame.transform.scale(pygame.image.load(f"{sprite_path}r1.png"), (96, 96)),
+            'right2': pygame.transform.scale(pygame.image.load(f"{sprite_path}r2.png"), (96, 96))
+        }
+        self.current_sprite = self.sprites[self.direction]
+
+    def change_sprite(self, sprite_path):
+        """Change player sprite to a specific image path"""
+        try:
+            sprite_path = sprite_path[:-1]
+            base_path = f"{gamePath}/img/{sprite_path}"
+            print(f"Loading sprite from: {base_path}")
+            
+            # Load and scale the sprite
+            new_sprite = pygame.transform.scale(
+                pygame.image.load(f"{base_path}.png"), 
+                (96, 96)
+            )
+            
+            # Update both current sprite and the default sprite for current direction
+            self.current_sprite = new_sprite
+            self.sprites[self.direction] = new_sprite
+            
+            print("Sprite changed successfully")
+            
+        except Exception as e:
+            print(f"Error changing sprite: {e}")

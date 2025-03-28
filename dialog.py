@@ -163,7 +163,7 @@ class Dialog:
                     avatar = pygame.transform.scale(avatar, (100, 100))
                     self.screen.blit(avatar, (680, self.y_position - 80))
                 except:
-                    print(f"Could not load avatar: {avatar_path}")
+                    pass #print(f"Could not load avatar: {avatar_path}")
 
             # Add Z indicator in bottom-right corner
             if self.is_text_complete:

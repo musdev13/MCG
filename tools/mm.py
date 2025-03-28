@@ -875,12 +875,14 @@ wait(seconds) - Wait specified seconds
 dialog(groupName) - Start dialog from group
 playerCantMove() - Disable player movement
 playerCanMove() - Enable player movement
+changeSprite(path) - Change player sprite (e.g. "player/d/idle_l")
 
 Example:
 playerCantMove();
 fadeIn(3);
 wait(2);
 dialog("intro");
+changeSprite("player/d/idle_l");
 playerCanMove();"""
 
         dialog = tk.Toplevel(self.root)
@@ -1047,7 +1049,6 @@ playerCanMove();"""
         return "\n".join(triggers)
 
     def parse_script_method(self):
-        """Generate the execute_script method for handling script triggers"""
         return '''    def execute_script(self, script):
         # Split by newlines and semicolons
         commands = []
@@ -1113,7 +1114,19 @@ playerCanMove();"""
                 elif line == "playerCantMove()":
                     self.cutscene_active = True
                 elif line == "playerCanMove()":
-                    self.cutscene_active = False'''
+                    self.cutscene_active = False
+                elif line.startswith("changeSprite("):
+                    # Extract sprite path without extra quotes
+                    sprite_path = line[12:-1].strip()  # Remove changeSprite( and )
+                    if sprite_path.startswith('"') or sprite_path.startswith("'"):
+                        sprite_path = sprite_path[1:-1]
+                    sprite_path = sprite_path[2:]  # Remove first 2 characters in addition to quotes
+                    print(f"Changing sprite to path: {sprite_path}")
+                    self.player.change_sprite(sprite_path)
+                    # Redraw to show the change immediately
+                    self.screen.blit(self.bg_image, (0, 0))
+                    self.player.draw(self.screen)
+                    pygame.display.flip()'''
 
     def create_script_group(self):
         dialog = tk.Toplevel(self.root)
