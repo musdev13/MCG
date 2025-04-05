@@ -26,6 +26,8 @@ class MapMaker:
         self.current_dialog_group = None
         self.script_groups = {}  # Dictionary to store script groups
         self.current_script_group = None
+        self.backgrounds = []  # List to store background layers
+        self.player_layer = 0  # Default player layer
         self.setup_ui()
         
     def setup_ui(self):
@@ -190,6 +192,55 @@ class MapMaker:
             text="Edit Script Group",
             command=self.edit_script_group
         ).pack(fill=tk.X, pady=2)
+
+        # Add background layers frame
+        layers_frame = ttk.LabelFrame(self.tools_frame, text="Background Layers")
+        layers_frame.pack(fill=tk.X, pady=5, padx=2)
+        
+        # Add layer buttons
+        ttk.Button(
+            layers_frame,
+            text="Add Layer",
+            command=self.add_background_layer
+        ).pack(fill=tk.X, pady=2)
+
+        # Layer list
+        self.layers_listbox = tk.Listbox(layers_frame, height=5)
+        self.layers_listbox.pack(fill=tk.X, pady=2)
+        
+        # Layer controls
+        layer_controls = ttk.Frame(layers_frame)
+        layer_controls.pack(fill=tk.X)
+        
+        ttk.Button(
+            layer_controls,
+            text="Move Up",
+            command=lambda: self.move_layer(-1)
+        ).pack(side=tk.LEFT, padx=2)
+        
+        ttk.Button(
+            layer_controls,
+            text="Move Down",
+            command=lambda: self.move_layer(1)
+        ).pack(side=tk.LEFT, padx=2)
+        
+        ttk.Button(
+            layer_controls,
+            text="Delete",
+            command=self.delete_layer
+        ).pack(side=tk.LEFT, padx=2)
+        
+        # Player layer selector
+        ttk.Label(layers_frame, text="Player Layer:").pack(pady=2)
+        self.player_layer_var = tk.StringVar(value="0")
+        self.player_layer_spin = ttk.Spinbox(
+            layers_frame,
+            from_=0,
+            to=0,
+            textvariable=self.player_layer_var,
+            command=self.update_player_layer
+        )
+        self.player_layer_spin.pack(fill=tk.X, pady=2)
         
     def draw_grid(self):
         self.canvas.delete("grid")
@@ -274,20 +325,25 @@ class MapMaker:
         if self.bg_path and os.path.exists(self.bg_path):
             # Load and resize image to 800x600
             original_image = Image.open(self.bg_path)
-            image = original_image.resize((800, 600))  # Fixed size for background
+            image = original_image.resize((800, 600))
             
             self.bg_image = ImageTk.PhotoImage(image)
             self.canvas.delete("all")
-            # Draw background centered in canvas
-            self.canvas.create_image(
-                (800 - 768) // 2,  # Center horizontally (800-grid_width*48)/2
-                (600 - 576) // 2,  # Center vertically (600-grid_height*48)/2
-                anchor=tk.NW,
-                image=self.bg_image
-            )
-            self.draw_grid()
-            self.redraw_cells()
             
+            # If this is the first background, add it as first layer
+            filename = os.path.basename(self.bg_path)
+            if not self.backgrounds:
+                self.backgrounds = [{
+                    "path": filename,
+                    "image": self.bg_image
+                }]
+                self.layers_listbox.delete(0, tk.END)  # Clear listbox
+                self.layers_listbox.insert(tk.END, "Layer 0")
+                self.player_layer_spin.config(to=0)
+                
+            # Draw all backgrounds in order
+            self.redraw_canvas()
+
     def update_tool(self):
         self.current_tool = self.tool_var.get()
         
@@ -400,12 +456,13 @@ class MapMaker:
         if file_path:
             try:
                 map_data = {
-                    "background": os.path.basename(self.bg_path),
+                    "backgrounds": [bg["path"] for bg in self.backgrounds],
+                    "player_layer": self.player_layer,
                     "player_skin": self.skin_var.get(),
                     "player_spawn": self.player_spawn,
                     "cells": self.cells,
                     "dialog_groups": self.dialog_groups,
-                    "startup_script": self.script_text.get("1.0", tk.END).strip(),  # Save script
+                    "startup_script": self.script_text.get("1.0", tk.END).strip(),
                     "script_groups": self.script_groups
                 }
                 
@@ -444,46 +501,66 @@ class MapMaker:
                 map_data = json.load(f)
             
             map_name = os.path.splitext(os.path.basename(file_path))[0]
-            bg_path = f"../img/{map_name}/bg.png"
+            self.map_name_var.set(map_name)
             
-            if os.path.exists(bg_path):
-                self.bg_path = bg_path
-                # Load and process background image
-                original_image = Image.open(bg_path)
-                image = original_image.resize((800, 600))
-                original_image.close()  # Close the image file
+            # Clear existing backgrounds
+            self.backgrounds = []
+            self.layers_listbox.delete(0, tk.END)
+            
+            # Handle old format with single background
+            if "background" in map_data:
+                bg_path = f"../img/{map_name}/{map_data['background']}"
+                if os.path.exists(bg_path):
+                    image = Image.open(bg_path)
+                    image = image.resize((800, 600))
+                    photo = ImageTk.PhotoImage(image)
+                    self.backgrounds.append({
+                        "path": map_data["background"],
+                        "image": photo
+                    })
+                    self.layers_listbox.insert(tk.END, "Layer 0")
+                    self.player_layer = 0
+                    self.player_layer_var.set("0")
+                    self.bg_path = bg_path
+                    self.bg_image = photo
+            
+            # Handle new format with multiple backgrounds
+            elif "backgrounds" in map_data:
+                for i, bg_path in enumerate(map_data["backgrounds"]):
+                    full_path = f"../img/{map_name}/{bg_path}"
+                    if os.path.exists(full_path):
+                        image = Image.open(full_path)
+                        image = image.resize((800, 600))
+                        photo = ImageTk.PhotoImage(image)
+                        self.backgrounds.append({
+                            "path": bg_path,
+                            "image": photo
+                        })
+                        self.layers_listbox.insert(tk.END, f"Layer {i}")
                 
-                self.bg_image = ImageTk.PhotoImage(image)
-                self.canvas.delete("all")
-                
-                # Draw background centered
-                self.canvas.create_image(
-                    (800 - 768) // 2,
-                    (600 - 576) // 2,
-                    anchor=tk.NW,
-                    image=self.bg_image
-                )
-                
-                # Update map data
-                self.map_name_var.set(map_name)
-                self.skin_var.set(map_data["player_skin"])
-                self.player_spawn = map_data["player_spawn"]
-                self.cells = map_data["cells"]
-                self.dialog_groups = map_data.get("dialog_groups", {})
-                self.script_groups = map_data.get("script_groups", {})
-                
-                self.draw_grid()
-                self.redraw_cells()
-                self.update_dialog_group_list()
-                self.update_script_group_list()
+                self.player_layer = map_data.get("player_layer", 0)
+                self.player_layer_var.set(str(self.player_layer))
+                if self.backgrounds:
+                    self.bg_path = f"../img/{map_name}/{self.backgrounds[0]['path']}"
+                    self.bg_image = self.backgrounds[0]['image']
 
-                # Load script
-                if "startup_script" in map_data:
-                    self.script_text.delete("1.0", tk.END)
-                    self.script_text.insert("1.0", map_data["startup_script"])
-                else:
-                    self.script_text.delete("1.0", tk.END)
-                
+            self.player_layer_spin.config(to=len(self.backgrounds)-1)
+            
+            # Load other map data
+            self.skin_var.set(map_data["player_skin"])
+            self.player_spawn = map_data["player_spawn"]
+            self.cells = map_data["cells"]
+            self.dialog_groups = map_data.get("dialog_groups", {})
+            self.script_groups = map_data.get("script_groups", {})
+            
+            if "startup_script" in map_data:
+                self.script_text.delete("1.0", tk.END)
+                self.script_text.insert("1.0", map_data["startup_script"])
+            
+            self.redraw_canvas()
+            self.update_dialog_group_list()
+            self.update_script_group_list()
+                    
         except Exception as e:
             tk.messagebox.showerror("Error", f"Failed to load map: {str(e)}")
             
@@ -736,6 +813,10 @@ class {map_name}:
                 row.append((x * self.grid_size, y * self.grid_size))
             self.grid.append(row)
 
+        self.backgrounds = []
+        # Load background layers
+        {self.generate_background_loading()}
+
         # Initialize player one cell above spawn point
         start_position = {self.player_spawn}
         spawn_y = start_position // 16 - 1  # Subtract 1 to move up one cell
@@ -746,6 +827,7 @@ class {map_name}:
             0,
             "{self.skin_var.get()}"
         )
+        self.player_layer = {self.player_layer}
 
         # Add collision blocks
         self.collisionBlocks = {self.get_collision_blocks()}
@@ -1300,6 +1382,112 @@ playerCanMove();"""
 
     def on_script_group_selected(self, event):
         self.current_script_group = self.script_group_var.get()
+
+    def add_background_layer(self):
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Image files", "*.png *.jpg *.jpeg")]
+        )
+        if file_path:
+            # Create map directory if needed
+            map_dir = os.path.join("../img", self.map_name_var.get())
+            os.makedirs(map_dir, exist_ok=True)
+            
+            # Copy image to map folder
+            layer_num = len(self.backgrounds)
+            new_filename = f"bg_{layer_num}.png"
+            new_path = os.path.join(map_dir, new_filename)
+            shutil.copy2(file_path, new_path)
+            
+            # Load and resize image
+            image = Image.open(new_path)
+            image = image.resize((800, 600))
+            photo = ImageTk.PhotoImage(image)
+            
+            # Store layer info
+            self.backgrounds.append({
+                "path": new_filename,
+                "image": photo
+            })
+            
+            # Update UI
+            self.layers_listbox.insert(tk.END, f"Layer {layer_num}")
+            self.player_layer_spin.config(to=layer_num)
+            self.redraw_canvas()
+
+    def move_layer(self, direction):
+        selection = self.layers_listbox.curselection()
+        if not selection:
+            return
+            
+        index = selection[0]
+        new_index = index + direction
+        
+        if 0 <= new_index < len(self.backgrounds):
+            # Swap layers
+            self.backgrounds[index], self.backgrounds[new_index] = \
+                self.backgrounds[new_index], self.backgrounds[index]
+                
+            # Update listbox
+            text = self.layers_listbox.get(index)
+            self.layers_listbox.delete(index)
+            self.layers_listbox.insert(new_index, text)
+            self.layers_listbox.selection_set(new_index)
+            
+            self.redraw_canvas()
+
+    def delete_layer(self):
+        selection = self.layers_listbox.curselection()
+        if not selection:
+            return
+            
+        index = selection[0]
+        del self.backgrounds[index]
+        self.layers_listbox.delete(index)
+        self.player_layer_spin.config(to=len(self.backgrounds)-1)
+        
+        if int(self.player_layer_var.get()) >= len(self.backgrounds):
+            self.player_layer_var.set(str(len(self.backgrounds)-1))
+        
+        self.redraw_canvas()
+
+    def update_player_layer(self):
+        self.player_layer = int(self.player_layer_var.get())
+        self.redraw_canvas()
+
+    def redraw_canvas(self):
+        self.canvas.delete("all")
+        
+        # Draw all backgrounds in order
+        for bg in self.backgrounds:
+            self.canvas.create_image(
+                (800 - 768) // 2,
+                (600 - 576) // 2,
+                anchor=tk.NW,
+                image=bg["image"]
+            )
+        
+        self.draw_grid()
+        self.redraw_cells()
+
+    def generate_background_loading(self):
+        lines = []
+        for bg in self.backgrounds:
+            lines.append(f'self.backgrounds.append(pygame.image.load(f"{{gamePath}}/img/{self.map_name_var.get()}/{bg["path"]}"))')
+        return "\n        ".join(lines)
+
+    def generate_background_drawing(self):
+        return """
+        # Draw backgrounds up to player layer
+        for i in range(self.player_layer + 1):
+            self.screen.blit(self.backgrounds[i], (0, 0))
+            
+        # Draw player
+        self.player.draw(self.screen)
+        
+        # Draw remaining backgrounds
+        for i in range(self.player_layer + 1, len(self.backgrounds)):
+            self.screen.blit(self.backgrounds[i], (0, 0))
+    """
 
 if __name__ == "__main__":
     root = tk.Tk()

@@ -107,6 +107,7 @@ class dreamW:
         self.dialog1_started = False
         self.all_dialogs_complete = not self.play_intro  # Set to True if play_intro is False
 
+        
         self.videobg = Video(f"{gamePath}/img/dreamW/blackwater.mp4")
         # self.videobg.set_size((800, 600))
         # self.videobg.preview()
@@ -246,9 +247,13 @@ class dreamW:
             current_time = pygame.time.get_ticks()
             
             # Video background handling
+            
             if self.videobg.get_pos() >= self.videobg.duration:
                 self.videobg.restart()
+            
+            #здесь видео позади заднего фона
             self.videobg.draw(self.screen, (0,0), force_draw=False)
+            #здесь задний фон поверх видео
             self.screen.blit(self.background, (0, 0))
             
             # Set player movement based on dialog state AND cutscene state
