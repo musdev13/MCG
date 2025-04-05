@@ -78,12 +78,15 @@ class MapMaker:
             
         # Player skin selection
         ttk.Label(self.tools_frame, text="\nPlayer Skin").pack(pady=5)
-        self.skin_var = tk.StringVar(value="marko")
-        skins = ["marko", "d"]
-        ttk.Combobox(
+        self.skin_var = tk.StringVar(value="marko")  # Default value
+        
+        # Get available skins from player folder
+        player_skins = self.get_available_skins()
+        
+        skin_combo = ttk.Combobox(
             self.tools_frame,
             textvariable=self.skin_var,
-            values=skins,
+            values=player_skins,
             state="readonly"
         ).pack(fill=tk.X, pady=2)
         
@@ -1518,6 +1521,24 @@ playerCanMove();"""
         for i in range(self.player_layer + 1, len(self.backgrounds)):
             self.screen.blit(self.backgrounds[i], (0, 0))
     """
+
+    def get_available_skins(self):
+        """Get list of available player skins from the player directory"""
+        player_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "img", "player")
+        
+        # Get all directories in player folder
+        skins = [d for d in os.listdir(player_dir) 
+                if os.path.isdir(os.path.join(player_dir, d))]
+        
+        # Ensure at least one skin exists
+        if not skins:
+            tk.messagebox.showwarning(
+                "Warning", 
+                "No skin folders found in player directory!\nPlease create at least one skin folder."
+            )
+            return ["marko"]  # Return default skin
+            
+        return skins
 
 if __name__ == "__main__":
     root = tk.Tk()

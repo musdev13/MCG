@@ -7,7 +7,7 @@ class Player:
         self.y = y
         self.speed = playerSpeed
         self.angle = angle
-        self.skin_type = skin_type  # Add skin type parameter
+        self.skin_type = skin_type
         self.canMove = True
         self.targetX = x
         self.targetY = y
@@ -16,9 +16,14 @@ class Player:
         self.animation_timer = 0
         self.animation_frame = 0
         self.is_moving = False
+        self.sprite_width = 96
+        self.sprite_height = 96
+        self.direction = 'down'
         
         # Load player sprites based on skin type
-        sprite_path = f"{gamePath}/img/player/{'d/' if skin_type == 'd' else ''}idle_"
+        sprite_path = f"{gamePath}/img/player/{skin_type}/idle_"  # Add skin_type to path
+        
+        # Initialize sprite dictionary
         self.sprites = {
             'up': pygame.transform.scale(pygame.image.load(f"{sprite_path}u.png"), (96, 96)),
             'up1': pygame.transform.scale(pygame.image.load(f"{sprite_path}u1.png"), (96, 96)),
@@ -33,14 +38,12 @@ class Player:
             'right1': pygame.transform.scale(pygame.image.load(f"{sprite_path}r1.png"), (96, 96)),
             'right2': pygame.transform.scale(pygame.image.load(f"{sprite_path}r2.png"), (96, 96))
         }
+        
         self.current_sprite = self.sprites['down']
-        self.direction = 'down'
         
         # Add screen boundaries
         self.screen_width = 800  # Total width (16 * 48)
         self.screen_height = 576  # Total height (12 * 48)
-        self.sprite_width = 96   # Width of player sprite
-        self.sprite_height = 96  # Height of player sprite
 
     def update_animation(self):
         if self.is_moving:

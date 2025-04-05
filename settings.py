@@ -1,8 +1,7 @@
-from colors import PURPLE
 import os
 
 WIDTH, HEIGHT = 800, 600
-gridColor = PURPLE
+gridColor = (128, 0, 128)  # RGB values for purple
 gamePath = os.path.dirname(__file__)
 debugGrid = False
 
