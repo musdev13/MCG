@@ -16,7 +16,7 @@ pygame.display.set_caption("")
 
 
 # background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # Масштабирование под размер окна
-Level.levelName = "d1"
+Level.levelName = "ltest"
 
 
 # Основной цикл программы

@@ -804,8 +804,6 @@ class {map_name}:
         self.is_fading = False
         self.fade_screen = None
 
-        self.bg_image = pygame.image.load(f"{{gamePath}}/img/{map_name}/bg.png")
-
         # Create grid
         for y in range(12):
             row = []
@@ -853,7 +851,9 @@ class {map_name}:
 {self.generate_script_triggers()}
 {self.generate_dialog_next_checks()}
 
-            self.screen.blit(self.bg_image, (0, 0))
+            # Draw backgrounds up to player layer
+            for i in range(self.player_layer + 1):
+                self.screen.blit(self.backgrounds[i], (0, 0))
             
             dG.draw(False, self.screen)
             
@@ -863,6 +863,10 @@ class {map_name}:
                 self.player.move(self)
             
             self.player.draw(self.screen)
+
+            # Draw remaining backgrounds
+            for i in range(self.player_layer + 1, len(self.backgrounds)):
+                self.screen.blit(self.backgrounds[i], (0, 0))
 
 {self.generate_dialog_drawing()}
 
@@ -996,6 +1000,14 @@ playerCanMove();"""
         parsed_lines.append("        self.black_surface = pygame.Surface((800, 600))")
         parsed_lines.append("        self.black_surface.fill((0, 0, 0))")
         
+        # Создаем шаблон для отрисовки слоев
+        layer_drawing = """        # Draw backgrounds up to player layer
+        for i in range(self.player_layer + 1):
+            self.screen.blit(self.backgrounds[i], (0, 0))
+        self.player.draw(self.screen)
+        for i in range(self.player_layer + 1, len(self.backgrounds)):
+            self.screen.blit(self.backgrounds[i], (0, 0))"""
+    
         for line in lines:
             # Remove trailing semicolon if present
             line = line.rstrip(";")
@@ -1008,8 +1020,7 @@ playerCanMove();"""
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_z:
                         self.{group}.next()
-            self.screen.blit(self.bg_image, (0, 0))
-            self.player.draw(self.screen)
+{layer_drawing}
             if self.{group}.is_active:
                 self.{group}.draw()
             pygame.display.flip()""")
@@ -1017,8 +1028,7 @@ playerCanMove();"""
                     seconds = line[5:-1]
                     parsed_lines.append(f"""        start_time = time.time()
         while time.time() - start_time < {seconds}:
-            self.screen.blit(self.bg_image, (0, 0))
-            self.player.draw(self.screen)
+{layer_drawing}
             pygame.display.flip()
             for event in pygame.event.get(): pass""")
                 elif line.startswith("fadeIn("):
@@ -1032,11 +1042,9 @@ playerCanMove();"""
             fade_alpha = max(0, 255 * (1 - current_time / fade_duration))
             fade_surface = self.black_surface.copy()
             fade_surface.set_alpha(int(fade_alpha))
-            self.screen.blit(self.bg_image, (0, 0))
-            self.player.draw(self.screen)
+{layer_drawing}
             self.screen.blit(fade_surface, (0, 0))
             pygame.display.flip()
-            #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass""")
                 elif line.startswith("fadeOut("):
                     duration = line[8:-1]
@@ -1049,20 +1057,16 @@ playerCanMove();"""
             fade_alpha = min(255, 255 * (current_time / fade_duration))
             fade_surface = self.black_surface.copy()
             fade_surface.set_alpha(int(fade_alpha))
-            self.screen.blit(self.bg_image, (0, 0))
-            self.player.draw(self.screen)
+{layer_drawing}
             self.screen.blit(fade_surface, (0, 0))
             pygame.display.flip()
-            #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass""")
                 elif line.startswith("wait("):
                     seconds = line[5:-1]
                     parsed_lines.append(f"""        start_time = time.time()
         while time.time() - start_time < {seconds}:
-            self.screen.blit(self.bg_image, (0, 0))
-            self.player.draw(self.screen)
+{layer_drawing}
             pygame.display.flip()
-            #pygame.time.Clock().tick(60)
             for event in pygame.event.get(): pass""")
                 elif line.startswith("dialog("):
                     group = line[7:-1].strip('"\'')
@@ -1384,28 +1388,45 @@ playerCanMove();"""
         self.current_script_group = self.script_group_var.get()
 
     def add_background_layer(self):
-        file_path = filedialog.askopenfilename(
-            filetypes=[("Image files", "*.png *.jpg *.jpeg")]
-        )
-        if file_path:
-            # Create map directory if needed
-            map_dir = os.path.join("../img", self.map_name_var.get())
-            os.makedirs(map_dir, exist_ok=True)
-            
-            # Copy image to map folder
-            layer_num = len(self.backgrounds)
-            new_filename = f"bg_{layer_num}.png"
-            new_path = os.path.join(map_dir, new_filename)
-            shutil.copy2(file_path, new_path)
-            
+        # Check if map name is set
+        if not self.map_name_var.get():
+            tk.messagebox.showerror("Error", "Please enter a map name first!")
+            return
+
+        # Get path to map's image folder
+        map_dir = os.path.join("../img", self.map_name_var.get())
+        
+        # Check if directory exists
+        if not os.path.exists(map_dir):
+            tk.messagebox.showerror("Error", f"No image folder found for map '{self.map_name_var.get()}'")
+            return
+
+        # Get list of available images
+        available_images = [f for f in os.listdir(map_dir) 
+                           if f.endswith(('.png', '.jpg', '.jpeg'))]
+        
+        if not available_images:
+            tk.messagebox.showerror("Error", "No images found in map folder!")
+            return
+
+        # Create image selection dialog
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Select Layer Image")
+        dialog.grab_set()
+
+        ttk.Label(dialog, text="Select image from map folder:").pack(pady=5)
+
+        def select_image(image_name):
             # Load and resize image
-            image = Image.open(new_path)
+            image_path = os.path.join(map_dir, image_name)
+            image = Image.open(image_path)
             image = image.resize((800, 600))
             photo = ImageTk.PhotoImage(image)
             
             # Store layer info
+            layer_num = len(self.backgrounds)
             self.backgrounds.append({
-                "path": new_filename,
+                "path": image_name,
                 "image": photo
             })
             
@@ -1413,6 +1434,15 @@ playerCanMove();"""
             self.layers_listbox.insert(tk.END, f"Layer {layer_num}")
             self.player_layer_spin.config(to=layer_num)
             self.redraw_canvas()
+            dialog.destroy()
+
+        # Create button for each available image
+        for img in available_images:
+            ttk.Button(
+                dialog,
+                text=img,
+                command=lambda i=img: select_image(i)
+            ).pack(fill=tk.X, pady=2, padx=5)
 
     def move_layer(self, direction):
         selection = self.layers_listbox.curselection()
